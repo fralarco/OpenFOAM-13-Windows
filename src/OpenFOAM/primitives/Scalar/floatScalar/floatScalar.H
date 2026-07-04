@@ -42,6 +42,17 @@ SourceFiles
 #include <limits>
 using std::numeric_limits;
 
+#if defined(__MINGW32__)
+// MinGW-w64/UCRT provides no float Bessel functions; delegate to the
+// double-precision POSIX functions
+inline float j0f(const float s) { return float(::j0(double(s))); }
+inline float j1f(const float s) { return float(::j1(double(s))); }
+inline float y0f(const float s) { return float(::y0(double(s))); }
+inline float y1f(const float s) { return float(::y1(double(s))); }
+inline float jnf(const int n, const float s) { return float(::jn(n, double(s))); }
+inline float ynf(const int n, const float s) { return float(::yn(n, double(s))); }
+#endif
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
@@ -145,21 +156,12 @@ inline Scalar atan2(const Scalar y, const Scalar x)
 
 inline Scalar jn(const int n, const Scalar s)
 {
-    #if defined(__MINGW32__)
-    // MinGW-w64/UCRT provides no float Bessel functions (jnf/ynf)
-    return Scalar(::jn(n, double(s)));
-    #else
     return ::jnf(n, s);
-    #endif
 }
 
 inline Scalar yn(const int n, const Scalar s)
 {
-    #if defined(__MINGW32__)
-    return Scalar(::yn(n, double(s)));
-    #else
     return ::ynf(n, s);
-    #endif
 }
 
 #undef Scalar

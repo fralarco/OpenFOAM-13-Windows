@@ -213,12 +213,21 @@ public:
 
     unsigned operator()(const void* const& p, unsigned seed) const
     {
+        #if defined(_WIN32)
+        // Windows LLP64: long is 32-bit, narrower than a pointer
+        return Hash<intptr_t>()(intptr_t(p), seed);
+        #else
         return Hash<long>()(long(p), seed);
+        #endif
     }
 
     unsigned operator()(const void* const& p) const
     {
+        #if defined(_WIN32)
+        return Hash<intptr_t>()(intptr_t(p));
+        #else
         return Hash<long>()(long(p));
+        #endif
     }
 };
 
