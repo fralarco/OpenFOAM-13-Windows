@@ -35,3 +35,12 @@ LINKLIBSO   = $(CC) $(c++FLAGS) -shared -Wl,--enable-auto-import \
               -Wl,--out-implib,$(LIB).$(SO).a
 
 LINKEXE     = $(CC) $(c++FLAGS) -Wl,--enable-auto-import
+
+# flex++-generated sources include FlexLexer.h; MSYS2's flex installs it
+# under /usr/include, which the native UCRT64 compiler must not search
+# (Cygwin libc headers). A vendored copy (BSD-licensed, from flex 2.6.4)
+# lives in these rules instead.
+Ltoo = $E $(call QUIET_MESSAGE,flex++,$(<F)) \
+    $(WM_SCHEDULER) flex -+ -o$(@D)/$(<F).C -f $< $(AND) \
+    $(CC) $(c++FLAGS) $(c++LESSWARN) -I$(DEFAULT_RULES)/include \
+    -c $(@D)/$(<F).C -o $@
