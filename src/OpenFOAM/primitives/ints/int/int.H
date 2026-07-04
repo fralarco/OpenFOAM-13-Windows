@@ -38,6 +38,10 @@ SourceFiles
 #include "int32.H"
 #include "int64.H"
 
+#if defined(_WIN32)
+#include "uint32.H"
+#endif
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
@@ -68,6 +72,41 @@ MAXMIN(int64_t, int64_t, int64_t)
 // * * * * * * * * * * * * * * * IOstream Operators  * * * * * * * * * * * * //
 
 int readInt(Istream&);
+
+
+#if defined(_WIN32)
+
+// Windows LLP64: long is a distinct 32-bit type, matched by neither the
+// int32_t nor the int64_t stream operators (on LP64 systems long is
+// int64_t). Delegate to the 32-bit operators.
+
+inline Istream& operator>>(Istream& is, long& l)
+{
+    int32_t i;
+    is >> i;
+    l = i;
+    return is;
+}
+
+inline Ostream& operator<<(Ostream& os, const long l)
+{
+    return os << int32_t(l);
+}
+
+inline Istream& operator>>(Istream& is, unsigned long& l)
+{
+    uint32_t i;
+    is >> i;
+    l = i;
+    return is;
+}
+
+inline Ostream& operator<<(Ostream& os, const unsigned long l)
+{
+    return os << uint32_t(l);
+}
+
+#endif
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
