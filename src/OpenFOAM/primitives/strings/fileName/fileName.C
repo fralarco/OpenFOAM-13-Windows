@@ -72,6 +72,25 @@ bool Foam::fileName::hasPath() const
 
 bool Foam::fileName::isAbsolute() const
 {
+    #if defined(_WIN32)
+    // Also recognise Windows drive-letter ("C:/...") and
+    // backslash-rooted paths
+    if
+    (
+        size() >= 2
+     && isalpha(operator[](0))
+     && operator[](1) == ':'
+    )
+    {
+        return true;
+    }
+
+    if (!empty() && operator[](0) == '\\')
+    {
+        return true;
+    }
+    #endif
+
     return !empty() && operator[](0) == '/';
 }
 
