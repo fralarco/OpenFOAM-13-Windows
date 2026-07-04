@@ -145,12 +145,21 @@ inline Scalar atan2(const Scalar y, const Scalar x)
 
 inline Scalar jn(const int n, const Scalar s)
 {
+    #if defined(__MINGW32__)
+    // MinGW-w64/UCRT provides no float Bessel functions (jnf/ynf)
+    return Scalar(::jn(n, double(s)));
+    #else
     return ::jnf(n, s);
+    #endif
 }
 
 inline Scalar yn(const int n, const Scalar s)
 {
+    #if defined(__MINGW32__)
+    return Scalar(::yn(n, double(s)));
+    #else
     return ::ynf(n, s);
+    #endif
 }
 
 #undef Scalar
