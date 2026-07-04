@@ -39,7 +39,7 @@ SourceFiles
 #define memInfo_H
 
 #include "OSspecific.H"
-#include "POSIX.H"
+#include "MSwindows.H"
 #include "IFstream.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
