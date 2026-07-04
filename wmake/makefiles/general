@@ -175,6 +175,15 @@ objects: $(OBJECTS) | silent
 .PHONY: libso
 libso: $(LIB).$(SO) | silent
 
+# PE shared libraries cannot contain unresolved symbols, so on Windows
+# every OpenFOAM library must link against libOpenFOAM itself
+# (ELF resolves these lazily at load time)
+ifeq ($(WM_ARCH),mingw_w64)
+ifneq ($(notdir $(LIB)),libOpenFOAM)
+    MINGW_PROJECT_LIBS = $(PROJECT_LIBS)
+endif
+endif
+
 $(LIB).$(SO): $(OBJECTS)
 	@$(WM_SCRIPTS)/makeTargetDir $(LIB)
 	$(call QUIET_MESSAGE,ld,$(LIB).$(SO))
@@ -185,7 +194,7 @@ ifeq ($(WM_ARCH),mingw_w64)
 	$(file >$(LIB).objs)$(foreach O,$(OBJECTS),$(file >>$(LIB).objs,$O))
 	$E cygpath -m -f $(LIB).objs > $(LIB).rsp
 	$E $(LINKLIBSO) @$(LIB).rsp -L$(LIB_PLATFORMS) \
-	    $(LIB_LIBS) $(GLIB_LIBS) -o $(LIB).$(SO)
+	    $(LIB_LIBS) $(GLIB_LIBS) $(MINGW_PROJECT_LIBS) -o $(LIB).$(SO)
 else
 	$E $(LINKLIBSO) $(OBJECTS) -L$(LIB_PLATFORMS) \
 	    $(LIB_LIBS) $(GLIB_LIBS) -o $(LIB).$(SO)
