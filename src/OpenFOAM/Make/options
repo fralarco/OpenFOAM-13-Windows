@@ -5,3 +5,8 @@ LIB_LIBS = \
     $(FOAM_LIBBIN)/libOSspecific.o \
     -L$(FOAM_LIBBIN)/dummy -lPstream \
     -lz
+
+ifeq ($(WM_ARCH),mingw_w64)
+    # Win32 APIs used by OSspecific/MSwindows
+    LIB_LIBS += -lpsapi -ladvapi32
+endif

@@ -29,6 +29,9 @@ LINK_LIBS   = $(c++DBUG)
 
 # PE linking: undefined symbols are always errors; ELF-only flags
 # (--add-needed/--no-as-needed) do not apply
-LINKLIBSO   = $(CC) $(c++FLAGS) -shared -Wl,--enable-auto-import
+# --out-implib: emit an import library beside each DLL so dependents can
+# link before the DLL's own dependencies are final (two-pass DLL cycles)
+LINKLIBSO   = $(CC) $(c++FLAGS) -shared -Wl,--enable-auto-import \
+              -Wl,--out-implib,$(LIB).$(SO).a
 
 LINKEXE     = $(CC) $(c++FLAGS) -Wl,--enable-auto-import

@@ -1,0 +1,19 @@
+signals/sigFpe.C
+signals/sigSegv.C
+signals/sigInt.C
+signals/sigQuit.C
+signals/sigStopAtWriteNow.C
+signals/sigWriteNow.C
+regExp.C
+fileStat.C
+MSwindows.C
+cpuTime/cpuTime.C
+clockTime/clockTime.C
+memInfo/memInfo.C
+
+# fileMonitor uses timestamp (stat) tracking; no inotify on Windows
+fileMonitor.C
+
+dummyPrintStack.C
+
+LIB = $(FOAM_LIBBIN)/libOSspecific

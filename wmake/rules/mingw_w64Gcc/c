@@ -15,6 +15,7 @@ LINK_LIBS   = $(cDBUG)
 
 # PE linking: undefined symbols are always errors; ELF-only flags
 # (-z nodefs, --add-needed) do not apply
-LINKLIBSO   = $(cc) -shared -Wl,--enable-auto-import
+LINKLIBSO   = $(cc) -shared -Wl,--enable-auto-import \
+              -Wl,--out-implib,$(LIB).$(SO).a
 
 LINKEXE     = $(cc) -Wl,--enable-auto-import
