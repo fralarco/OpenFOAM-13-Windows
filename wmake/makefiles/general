@@ -191,9 +191,12 @@ $(LIB).$(SO): $(OBJECTS)
 ifeq ($(WM_ARCH),mingw_w64)
 # Windows command lines cannot hold the full object list: pass the
 # objects through a GCC response file, converting the MSYS-style paths
-# to Windows form (no automatic conversion happens inside @files)
+# to Windows form (no automatic conversion happens inside @files).
+# The list is reversed (tac): the MinGW CRT runs .ctors in reverse link
+# order while ELF init_array runs forward, so reversing restores the
+# upstream static-initialisation order (word::null before its users)
 	$(file >$(LIB).objs)$(foreach O,$(OBJECTS),$(file >>$(LIB).objs,$O))
-	$E cygpath -m -f $(LIB).objs > $(LIB).rsp
+	$E tac $(LIB).objs | cygpath -m -f - > $(LIB).rsp
 	$E $(LINKLIBSO) @$(LIB).rsp -L$(LIB_PLATFORMS) \
 	    $(LIB_LIBS) $(GLIB_LIBS) $(MINGW_PROJECT_LIBS) -o $(LIB).$(SO)
 else
