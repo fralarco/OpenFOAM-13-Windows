@@ -39,6 +39,11 @@ License
     #endif
 #endif
 
+// Windows: no <endian.h>; all supported architectures are little-endian
+#if defined(_WIN32) && !defined(LITTLE_ENDIAN)
+    #define LITTLE_ENDIAN
+#endif
+
 #if defined(LITTLE_ENDIAN) \
  || defined(_LITTLE_ENDIAN) \
  || defined(__LITTLE_ENDIAN)
