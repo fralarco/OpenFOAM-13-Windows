@@ -37,7 +37,7 @@ License
 #define ScalarRootVSmall longDoubleScalarRootVSmall
 #define ScalarNaN longDoubleScalarNaN
 #define readScalar readLongDoubleScalar
-#include "Scalar.C"
+#include "ScalarTempl.C"
 #undef Scalar
 #undef ScalarVGreat
 #undef ScalarVSmall

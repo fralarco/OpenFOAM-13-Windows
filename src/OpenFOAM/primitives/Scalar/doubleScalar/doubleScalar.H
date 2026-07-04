@@ -125,7 +125,7 @@ inline Scalar func(const Scalar s) \
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-#include "Scalar.H"
+#include "ScalarTempl.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
