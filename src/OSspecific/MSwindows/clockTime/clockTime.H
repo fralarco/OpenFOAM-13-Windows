@@ -37,6 +37,9 @@ SourceFiles
 #define clockTime_H
 
 #include <sys/types.h>
+// MinGW-w64: struct timeval/gettimeofday live in <sys/time.h>; without
+// this include the typedef below silently forward-declares Foam::timeval
+#include <sys/time.h>
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -52,7 +55,7 @@ class clockTime
     // Private Data
 
         //- Time structure used
-        typedef struct timeval timeType;
+        typedef struct ::timeval timeType;
 
         timeType startTime_;
 
