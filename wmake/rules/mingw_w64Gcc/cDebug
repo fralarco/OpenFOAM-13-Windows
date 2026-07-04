@@ -1,0 +1,2 @@
+cDBUG       = -ggdb3 -DFULLDEBUG
+cOPT        = -O0 -fdefault-inline

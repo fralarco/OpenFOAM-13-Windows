@@ -1,0 +1,15 @@
+#----------------------------*- makefile-gmake -*------------------------------
+# Windows MinGW-w64 (native, MSYS2 or standalone) GCC rules.
+# Part of the FoamStudio OpenFOAM 13 Windows port. Independently derived
+# from the linux64Gcc rules for PE/COFF targets.
+
+# PE shared libraries: no libdl on Windows (dlopen handled in OSspecific)
+PROJECT_LIBS = -l$(WM_PROJECT)
+
+# Shared library extension for PE targets
+SO = dll
+
+include $(GENERAL_RULES)/standard
+
+include $(DEFAULT_RULES)/c
+include $(DEFAULT_RULES)/c++

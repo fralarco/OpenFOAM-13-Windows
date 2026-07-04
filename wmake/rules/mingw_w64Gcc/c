@@ -1,0 +1,20 @@
+SUFFIXES += .c
+
+cWARN        = -Wall
+
+cc          = gcc -m64
+
+include $(DEFAULT_RULES)/c$(WM_COMPILE_OPTION)
+
+# No -fPIC: PE/COFF code is inherently position independent
+cFLAGS      = $(GFLAGS) $(cWARN) $(cOPT) $(cDBUG) $(LIB_HEADER_DIRS)
+
+ctoo        = $(WM_SCHEDULER) $(cc) $(cFLAGS) -c $< -o $@
+
+LINK_LIBS   = $(cDBUG)
+
+# PE linking: undefined symbols are always errors; ELF-only flags
+# (-z nodefs, --add-needed) do not apply
+LINKLIBSO   = $(cc) -shared -Wl,--enable-auto-import
+
+LINKEXE     = $(cc) -Wl,--enable-auto-import

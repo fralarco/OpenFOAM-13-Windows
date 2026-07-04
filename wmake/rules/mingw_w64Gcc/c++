@@ -1,0 +1,34 @@
+SUFFIXES += .C
+
+c++WARN     = -Wall -Wextra -Wold-style-cast -Wnon-virtual-dtor \
+              -Wno-unused-parameter -Wno-invalid-offsetof -Wno-attributes
+
+# Suppress some warnings for flex++
+c++LESSWARN = -Wno-old-style-cast -Wno-unused-local-typedefs -Wno-array-bounds
+
+# gnu++14 (not c++14): strict-ANSI mode hides POSIX math declarations
+# (jn, yn, ...) in the MinGW-w64/UCRT headers
+CC          = g++ -std=gnu++14 -m64
+
+include $(DEFAULT_RULES)/c++$(WM_COMPILE_OPTION)
+
+ptFLAGS     = -DNoRepository -ftemplate-depth-256
+
+# -Wa,-mbig-obj: large template translation units exceed the default
+# COFF section limit on x86_64
+# No -fPIC: PE/COFF code is inherently position independent
+c++FLAGS    = $(GFLAGS) $(c++WARN) $(c++OPT) $(c++DBUG) $(ptFLAGS) \
+              $(LIB_HEADER_DIRS) -Wa,-mbig-obj
+
+Ctoo        = $(WM_SCHEDULER) $(CC) $(c++FLAGS) -c $< -o $@
+cxxtoo      = $(Ctoo)
+cctoo       = $(Ctoo)
+cpptoo      = $(Ctoo)
+
+LINK_LIBS   = $(c++DBUG)
+
+# PE linking: undefined symbols are always errors; ELF-only flags
+# (--add-needed/--no-as-needed) do not apply
+LINKLIBSO   = $(CC) $(c++FLAGS) -shared -Wl,--enable-auto-import
+
+LINKEXE     = $(CC) $(c++FLAGS) -Wl,--enable-auto-import
