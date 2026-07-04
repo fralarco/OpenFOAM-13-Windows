@@ -106,6 +106,35 @@ inline Ostream& operator<<(Ostream& os, const unsigned long l)
     return os << uint32_t(l);
 }
 
+// MinGW mode_t is unsigned short (unsigned int on Linux); needed e.g.
+// by fileOperations masterOp<mode_t>
+
+inline Istream& operator>>(Istream& is, short& s)
+{
+    int32_t i;
+    is >> i;
+    s = short(i);
+    return is;
+}
+
+inline Ostream& operator<<(Ostream& os, const short s)
+{
+    return os << int32_t(s);
+}
+
+inline Istream& operator>>(Istream& is, unsigned short& s)
+{
+    uint32_t i;
+    is >> i;
+    s = static_cast<unsigned short>(i);
+    return is;
+}
+
+inline Ostream& operator<<(Ostream& os, const unsigned short s)
+{
+    return os << uint32_t(s);
+}
+
 #endif
 
 
