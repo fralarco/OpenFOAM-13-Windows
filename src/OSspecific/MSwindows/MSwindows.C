@@ -50,8 +50,14 @@ License
 #include <sys/types.h>
 #include <sys/stat.h>
 
+// OpenFOAM's DebugInfo macro (messageStream.H) collides with the
+// RTL_CRITICAL_SECTION::DebugInfo member in winnt.h
+#undef DebugInfo
+
 #define WIN32_LEAN_AND_MEAN
+#ifndef NOMINMAX
 #define NOMINMAX
+#endif
 #include <windows.h>
 #include <psapi.h>
 #include <tlhelp32.h>
@@ -1102,7 +1108,7 @@ void* Foam::dlOpen(const fileName& lib, const bool check)
     // Map Linux-style library names (libXXX.so) used in dictionaries and
     // upstream configuration to Windows DLL names
     fileName libName(lib);
-    if (libName.hasExt("so"))
+    if (libName.ext() == "so")
     {
         libName = libName.lessExt() + ".dll";
     }
@@ -1113,7 +1119,7 @@ void* Foam::dlOpen(const fileName& lib, const bool check)
     if (!handle && check)
     {
         WarningInFunction
-            << "LoadLibrary error " << GetLastError()
+            << "LoadLibrary error " << unsigned(GetLastError())
             << " for library " << libName
             << endl;
     }
@@ -1162,7 +1168,7 @@ void* Foam::dlSym(void* handle, const std::string& symbol)
     {
         WarningInFunction
             << "Cannot lookup symbol " << symbol
-            << " : error " << GetLastError()
+            << " : error " << unsigned(GetLastError())
             << endl;
     }
 
