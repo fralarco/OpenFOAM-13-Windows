@@ -178,8 +178,18 @@ libso: $(LIB).$(SO) | silent
 $(LIB).$(SO): $(OBJECTS)
 	@$(WM_SCRIPTS)/makeTargetDir $(LIB)
 	$(call QUIET_MESSAGE,ld,$(LIB).$(SO))
+ifeq ($(WM_ARCH),mingw_w64)
+# Windows command lines cannot hold the full object list: pass the
+# objects through a GCC response file, converting the MSYS-style paths
+# to Windows form (no automatic conversion happens inside @files)
+	$(file >$(LIB).objs)$(foreach O,$(OBJECTS),$(file >>$(LIB).objs,$O))
+	$E cygpath -m -f $(LIB).objs > $(LIB).rsp
+	$E $(LINKLIBSO) @$(LIB).rsp -L$(LIB_PLATFORMS) \
+	    $(LIB_LIBS) $(GLIB_LIBS) -o $(LIB).$(SO)
+else
 	$E $(LINKLIBSO) $(OBJECTS) -L$(LIB_PLATFORMS) \
 	    $(LIB_LIBS) $(GLIB_LIBS) -o $(LIB).$(SO)
+endif
 
 .PHONY: lib
 lib: $(LIB).a | silent
