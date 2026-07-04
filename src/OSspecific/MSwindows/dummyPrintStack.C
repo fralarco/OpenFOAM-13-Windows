@@ -30,4 +30,7 @@ License
 void Foam::error::printStack(Ostream& os)
 {}
 
+void Foam::error::safePrintStack(std::ostream& os)
+{}
+
 // ************************************************************************* //
