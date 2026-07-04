@@ -31,10 +31,16 @@ LINK_LIBS   = $(c++DBUG)
 # (--add-needed/--no-as-needed) do not apply
 # --out-implib: emit an import library beside each DLL so dependents can
 # link before the DLL's own dependencies are final (two-pass DLL cycles)
+# --allow-multiple-definition: explicit template specialisations
+# (e.g. processorFvPatchField<scalar>) coexist with implicit COMDAT
+# instantiations from other translation units; ELF merges these as weak
+# symbols but PE ld reports duplicates
 LINKLIBSO   = $(CC) $(c++FLAGS) -shared -Wl,--enable-auto-import \
+              -Wl,--allow-multiple-definition \
               -Wl,--out-implib,$(LIB).$(SO).a
 
-LINKEXE     = $(CC) $(c++FLAGS) -Wl,--enable-auto-import
+LINKEXE     = $(CC) $(c++FLAGS) -Wl,--enable-auto-import \
+              -Wl,--allow-multiple-definition
 
 # flex++-generated sources include FlexLexer.h; MSYS2's flex installs it
 # under /usr/include, which the native UCRT64 compiler must not search
