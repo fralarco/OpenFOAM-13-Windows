@@ -14,3 +14,10 @@ LIB_LIBS = \
     -lfileFormats \
     -ltriSurface \
     -llagrangian
+
+ifeq ($(WM_ARCH),mingw_w64)
+    # PE needs the full link closure: tracking symbols are referenced
+    # directly (particle::hitFace instantiations) but reach ELF builds
+    # transitively through liblagrangian
+    LIB_LIBS += -ltracking
+endif
