@@ -175,13 +175,13 @@ objects: $(OBJECTS) | silent
 .PHONY: libso
 libso: $(LIB).$(SO) | silent
 
-# PE shared libraries cannot contain unresolved symbols, so on Windows
-# every OpenFOAM library must link against libOpenFOAM and libPstream
-# (ELF resolves these lazily at load time)
+# PE images cannot contain unresolved symbols, so on Windows every
+# OpenFOAM library AND executable must link against libOpenFOAM and
+# libPstream (ELF resolves these lazily at load time)
 ifeq ($(WM_ARCH),mingw_w64)
+    PROJECT_LIBS += -L$(LIB_PLATFORMS)/$(FOAM_MPI) -lPstream
 ifneq ($(notdir $(LIB)),libOpenFOAM)
-    MINGW_PROJECT_LIBS = $(PROJECT_LIBS) \
-        -L$(LIB_PLATFORMS)/$(FOAM_MPI) -lPstream
+    MINGW_PROJECT_LIBS = $(PROJECT_LIBS)
 endif
 endif
 
