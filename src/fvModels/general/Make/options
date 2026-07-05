@@ -19,3 +19,16 @@ LIB_LIBS = \
     -lmomentumTransportModels \
     -lcompressibleMomentumTransportModels \
     -lfluidThermoThermophysicalTransportModels
+
+ifeq ($(WM_ARCH),mingw_w64)
+    # PE/COFF requires resolving thermo-stack symbols referenced directly
+    # (basicThermo, fluidThermo, multicomponentThermo, solidThermo,
+    # physicalProperties, thermophysicalTransportModel) at link time;
+    # ELF gets them transitively at load time
+    LIB_LIBS += \
+        -lfluidThermophysicalModels \
+        -lmulticomponentThermophysicalModels \
+        -lsolidThermo \
+        -lphysicalProperties \
+        -lthermophysicalTransportModel
+endif
