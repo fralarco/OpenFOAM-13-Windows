@@ -8,3 +8,16 @@ EXE_INC = \
 
 LIB_LIBS = \
     -lfluidSolver
+
+ifeq ($(WM_ARCH),mingw_w64)
+    # PE/COFF requires resolving directly-referenced symbols at link time
+    # (fvMesh/fvSchemes/MRF/solver from finiteVolume, fvModels,
+    # fvConstraints, incompressibleMomentumTransportModel::New,
+    # viscosityModel::New); ELF gets them transitively at load time
+    LIB_LIBS += \
+        -lfiniteVolume \
+        -lfvModels \
+        -lfvConstraints \
+        -lincompressibleMomentumTransportModels \
+        -lphysicalProperties
+endif
