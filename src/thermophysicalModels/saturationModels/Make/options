@@ -15,3 +15,9 @@ LIB_LIBS = \
     -lfluidThermophysicalModels \
     -lmulticomponentThermophysicalModels \
     -lspecie
+
+ifeq ($(WM_ARCH),mingw_w64)
+    # PE/COFF requires explicit link closure for directly
+    # referenced symbols; ELF resolves them at load time
+    LIB_LIBS += -lfiniteVolume
+endif
