@@ -12,3 +12,9 @@ LIB_LIBS = \
     -lspecie \
     -lfluidThermophysicalModels \
     -lmulticomponentThermophysicalModels
+
+ifeq ($(WM_ARCH),mingw_w64)
+    # PE/COFF requires resolving physicalProperties base-class symbols
+    # at link time; ELF gets them transitively at load time
+    LIB_LIBS += -lphysicalProperties
+endif
