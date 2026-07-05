@@ -8,3 +8,9 @@ LIB_LIBS = \
     -lphysicalProperties \
     -lfiniteVolume \
     -lmeshTools
+
+ifeq ($(WM_ARCH),mingw_w64)
+    # PE/COFF requires resolving momentumTransportModel base-class symbols
+    # at link time; ELF gets them transitively at load time
+    LIB_LIBS += -lmomentumTransportModels
+endif
