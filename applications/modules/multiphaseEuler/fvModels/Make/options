@@ -31,3 +31,33 @@ LIB_LIBS = \
     -lphaseFluidThermophysicalTransportModels \
     -lphaseFluidMulticomponentThermophysicalTransportModels \
     -lcoupledThermophysicalTransportModels
+
+ifeq ($(WM_ARCH),mingw_w64)
+    # PE/COFF requires explicit link closure for directly
+    # referenced symbols; ELF resolves them at load time
+    LIB_LIBS += -lfiniteVolume -lmomentumTransportModels -ltwoPhaseMixture
+endif
+
+ifeq ($(WM_ARCH),mingw_w64)
+    # PE/COFF requires explicit link closure for directly
+    # referenced symbols; ELF resolves them at load time
+    LIB_LIBS += -lfluidThermophysicalModels -lthermophysicalTransportModel
+endif
+
+ifeq ($(WM_ARCH),mingw_w64)
+    # PE/COFF requires explicit link closure for directly
+    # referenced symbols; ELF resolves them at load time
+    LIB_LIBS += -lfluidThermoThermophysicalTransportModels
+endif
+
+ifeq ($(WM_ARCH),mingw_w64)
+    # PE/COFF requires explicit link closure for directly
+    # referenced symbols; ELF resolves them at load time
+    LIB_LIBS += -lsampling -lsaturationModels
+endif
+
+ifeq ($(WM_ARCH),mingw_w64)
+    # PE/COFF requires explicit link closure for directly
+    # referenced symbols; ELF resolves them at load time
+    LIB_LIBS += -lfluidThermophysicalTransportModel
+endif
