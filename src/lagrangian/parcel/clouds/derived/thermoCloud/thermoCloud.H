@@ -33,8 +33,8 @@ Description
 #define thermoCloud_H
 
 #include "ParcelCloudBaseTempl.H"
-#include "MomentumCloud.H"
-#include "ThermoCloud.H"
+#include "MomentumCloudTempl.H"
+#include "ThermoCloudTempl.H"
 #include "ParcelCloudTempl.H"
 #include "thermoParcel.H"
 

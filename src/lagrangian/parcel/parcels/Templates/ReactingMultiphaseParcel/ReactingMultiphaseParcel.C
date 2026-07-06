@@ -23,7 +23,7 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "ReactingMultiphaseParcel.H"
+#include "ReactingMultiphaseParcelTempl.H"
 #include "CompositionModel.H"
 #include "NoDevolatilisation.H"
 #include "NoSurfaceReaction.H"

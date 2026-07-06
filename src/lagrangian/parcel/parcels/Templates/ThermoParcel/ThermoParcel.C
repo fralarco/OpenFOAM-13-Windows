@@ -23,7 +23,7 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "ThermoParcel.H"
+#include "ThermoParcelTempl.H"
 #include "NoHeatTransfer.H"
 #include "physicoChemicalConstants.H"
 

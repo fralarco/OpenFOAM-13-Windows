@@ -33,10 +33,10 @@ Description
 #define sprayCloud_H
 
 #include "ParcelCloudBaseTempl.H"
-#include "MomentumCloud.H"
-#include "ThermoCloud.H"
-#include "ReactingCloud.H"
-#include "SprayCloud.H"
+#include "MomentumCloudTempl.H"
+#include "ThermoCloudTempl.H"
+#include "ReactingCloudTempl.H"
+#include "SprayCloudTempl.H"
 #include "ParcelCloudTempl.H"
 #include "sprayParcel.H"
 

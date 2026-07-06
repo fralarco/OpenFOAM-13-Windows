@@ -33,8 +33,8 @@ Description
 #define collidingCloud_H
 
 #include "ParcelCloudBaseTempl.H"
-#include "MomentumCloud.H"
-#include "CollidingCloud.H"
+#include "MomentumCloudTempl.H"
+#include "CollidingCloudTempl.H"
 #include "ParcelCloudTempl.H"
 #include "collidingParcel.H"
 

@@ -38,10 +38,10 @@ SourceFiles
 
 #include "contiguous.H"
 #include "particle.H"
-#include "MomentumParcel.H"
-#include "ThermoParcel.H"
-#include "ReactingParcel.H"
-#include "ReactingMultiphaseParcel.H"
+#include "MomentumParcelTempl.H"
+#include "ThermoParcelTempl.H"
+#include "ReactingParcelTempl.H"
+#include "ReactingMultiphaseParcelTempl.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

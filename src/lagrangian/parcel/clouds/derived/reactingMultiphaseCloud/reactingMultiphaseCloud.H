@@ -33,10 +33,10 @@ Description
 #define reactingMultiphaseCloud_H
 
 #include "ParcelCloudBaseTempl.H"
-#include "MomentumCloud.H"
-#include "ThermoCloud.H"
-#include "ReactingCloud.H"
-#include "ReactingMultiphaseCloud.H"
+#include "MomentumCloudTempl.H"
+#include "ThermoCloudTempl.H"
+#include "ReactingCloudTempl.H"
+#include "ReactingMultiphaseCloudTempl.H"
 #include "ParcelCloudTempl.H"
 #include "reactingMultiphaseParcel.H"
 

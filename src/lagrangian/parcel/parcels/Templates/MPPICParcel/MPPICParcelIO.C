@@ -23,7 +23,7 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "MPPICParcel.H"
+#include "MPPICParcelTempl.H"
 #include "IOstreams.H"
 #include "IOField.H"
 

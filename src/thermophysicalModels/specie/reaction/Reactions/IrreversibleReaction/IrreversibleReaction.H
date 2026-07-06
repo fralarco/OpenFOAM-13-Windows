@@ -35,7 +35,7 @@ SourceFiles
 #ifndef IrreversibleReaction_H
 #define IrreversibleReaction_H
 
-#include "Reaction.H"
+#include "ReactionTempl.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

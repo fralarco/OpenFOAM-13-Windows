@@ -23,7 +23,7 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "MomentumParcel.H"
+#include "MomentumParcelTempl.H"
 #include "mathematicalConstants.H"
 
 using namespace Foam::constant::mathematical;

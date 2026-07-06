@@ -33,9 +33,9 @@ Description
 #define reactingCloud_H
 
 #include "ParcelCloudBaseTempl.H"
-#include "MomentumCloud.H"
-#include "ThermoCloud.H"
-#include "ReactingCloud.H"
+#include "MomentumCloudTempl.H"
+#include "ThermoCloudTempl.H"
+#include "ReactingCloudTempl.H"
 #include "ParcelCloudTempl.H"
 #include "reactingParcel.H"
 

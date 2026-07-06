@@ -35,7 +35,7 @@ SourceFiles
 #ifndef laminarThermophysicalTransportModel_H
 #define laminarThermophysicalTransportModel_H
 
-#include "ThermophysicalTransportModel.H"
+#include "ThermophysicalTransportModelTempl.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

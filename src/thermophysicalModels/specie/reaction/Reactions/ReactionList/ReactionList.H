@@ -35,7 +35,7 @@ SourceFiles
 #ifndef ReactionList_H
 #define ReactionList_H
 
-#include "Reaction.H"
+#include "ReactionTempl.H"
 #include "speciesTable.H"
 #include "PtrList.H"
 

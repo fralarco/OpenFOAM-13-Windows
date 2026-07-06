@@ -23,7 +23,7 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "SprayParcel.H"
+#include "SprayParcelTempl.H"
 #include "forceSuSp.H"
 #include "CompositionModel.H"
 #include "AtomisationModel.H"

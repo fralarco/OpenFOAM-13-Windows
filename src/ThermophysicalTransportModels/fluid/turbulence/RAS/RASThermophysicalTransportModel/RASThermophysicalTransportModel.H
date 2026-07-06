@@ -35,7 +35,7 @@ SourceFiles
 #ifndef RASThermophysicalTransportModel_H
 #define RASThermophysicalTransportModel_H
 
-#include "ThermophysicalTransportModel.H"
+#include "ThermophysicalTransportModelTempl.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

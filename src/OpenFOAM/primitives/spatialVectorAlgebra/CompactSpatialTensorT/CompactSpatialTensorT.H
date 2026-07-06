@@ -47,7 +47,7 @@ See also
 #ifndef CompactSpatialTensorT_H
 #define CompactSpatialTensorT_H
 
-#include "CompactSpatialTensor.H"
+#include "CompactSpatialTensorTempl.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

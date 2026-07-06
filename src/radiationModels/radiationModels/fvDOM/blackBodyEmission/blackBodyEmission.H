@@ -41,7 +41,7 @@ SourceFiles
 #include "volFields.H"
 #include "dimensionedScalar.H"
 #include "Table.H"
-#include "Vector2D.H"
+#include "Vector2DTempl.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

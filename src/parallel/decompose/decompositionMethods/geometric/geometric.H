@@ -36,7 +36,7 @@ SourceFiles
 #define geometric_H
 
 #include "decompositionMethod.H"
-#include "Vector.H"
+#include "VectorTempl.H"
 
 namespace Foam
 {

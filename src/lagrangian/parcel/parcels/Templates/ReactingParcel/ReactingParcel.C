@@ -23,7 +23,7 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "ReactingParcel.H"
+#include "ReactingParcelTempl.H"
 #include "specie.H"
 #include "CompositionModel.H"
 #include "PhaseChangeModel.H"

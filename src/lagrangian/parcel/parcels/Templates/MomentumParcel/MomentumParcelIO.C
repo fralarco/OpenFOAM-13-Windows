@@ -23,7 +23,7 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "MomentumParcel.H"
+#include "MomentumParcelTempl.H"
 #include "IOstreams.H"
 #include "IOField.H"
 #include "CloudTempl.H"

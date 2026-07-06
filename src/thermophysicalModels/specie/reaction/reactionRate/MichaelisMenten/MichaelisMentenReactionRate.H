@@ -42,7 +42,7 @@ SourceFiles
 #ifndef MichaelisMentenReactionRate_H
 #define MichaelisMentenReactionRate_H
 
-#include "Reaction.H"
+#include "ReactionTempl.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

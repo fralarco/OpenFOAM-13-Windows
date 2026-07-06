@@ -33,7 +33,7 @@ Description
 #define vectorAndError_H
 
 #include "scalarAndError.H"
-#include "Vector.H"
+#include "VectorTempl.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

@@ -34,8 +34,8 @@ Description
 
 #include "contiguous.H"
 #include "particle.H"
-#include "MomentumParcel.H"
-#include "CollidingParcel.H"
+#include "MomentumParcelTempl.H"
+#include "CollidingParcelTempl.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

@@ -35,7 +35,7 @@ SourceFiles
 #ifndef NonEquilibriumReversibleReaction_H
 #define NonEquilibriumReversibleReaction_H
 
-#include "Reaction.H"
+#include "ReactionTempl.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

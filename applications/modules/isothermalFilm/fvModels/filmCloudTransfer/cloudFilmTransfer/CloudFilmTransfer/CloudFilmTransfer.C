@@ -26,7 +26,7 @@ License
 #include "CloudFilmTransfer.H"
 #include "filmCloudTransfer.H"
 #include "mappedFvPatchBaseBase.H"
-#include "ThermoCloud.H"
+#include "ThermoCloudTempl.H"
 #include "meshTools.H"
 #include "mathematicalConstants.H"
 #include "addToRunTimeSelectionTable.H"

@@ -35,7 +35,7 @@ SourceFiles
 #ifndef LESThermophysicalTransportModel_H
 #define LESThermophysicalTransportModel_H
 
-#include "ThermophysicalTransportModel.H"
+#include "ThermophysicalTransportModelTempl.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

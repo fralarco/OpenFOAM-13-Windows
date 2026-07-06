@@ -35,7 +35,7 @@ SourceFiles
 #ifndef labelSymmTensor_H
 #define labelSymmTensor_H
 
-#include "SymmTensor.H"
+#include "SymmTensorTempl.H"
 #include "contiguous.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

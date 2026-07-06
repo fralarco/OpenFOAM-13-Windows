@@ -23,7 +23,7 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "CollidingParcel.H"
+#include "CollidingParcelTempl.H"
 #include "IOstreams.H"
 #include "IOField.H"
 

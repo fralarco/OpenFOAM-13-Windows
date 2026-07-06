@@ -37,8 +37,8 @@ SourceFiles
 
 #include "contiguous.H"
 #include "particle.H"
-#include "MomentumParcel.H"
-#include "ThermoParcel.H"
+#include "MomentumParcelTempl.H"
+#include "ThermoParcelTempl.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

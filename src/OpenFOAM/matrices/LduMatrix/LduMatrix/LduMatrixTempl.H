@@ -53,7 +53,7 @@ SourceFiles
 #include "lduMesh.H"
 #include "Field.H"
 #include "FieldField.H"
-#include "LduInterfaceFieldPtrsList.H"
+#include "LduInterfaceFieldPtrsListTempl.H"
 #include "SolverPerformanceTempl.H"
 #include "typeInfo.H"
 #include "autoPtr.H"

@@ -23,7 +23,7 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "DSMCCloud.H"
+#include "DSMCCloudTempl.H"
 #include "NoBinaryCollision.H"
 #include "WallInteractionModel.H"
 #include "InflowBoundaryModel.H"

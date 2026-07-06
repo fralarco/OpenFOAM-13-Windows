@@ -23,7 +23,7 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "MomentumParcel.H"
+#include "MomentumParcelTempl.H"
 #include "forceSuSp.H"
 #include "integrationScheme.H"
 #include "meshTools.H"

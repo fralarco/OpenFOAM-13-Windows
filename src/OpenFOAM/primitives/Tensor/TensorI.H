@@ -23,8 +23,8 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "SymmTensor.H"
-#include "DiagTensor.H"
+#include "SymmTensorTempl.H"
+#include "DiagTensorTempl.H"
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 

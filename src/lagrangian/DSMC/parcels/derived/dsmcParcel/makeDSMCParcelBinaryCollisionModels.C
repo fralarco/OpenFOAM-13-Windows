@@ -24,7 +24,7 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "dsmcParcel.H"
-#include "DSMCCloud.H"
+#include "DSMCCloudTempl.H"
 #include "NoBinaryCollision.H"
 #include "VariableHardSphere.H"
 #include "LarsenBorgnakkeVariableHardSphere.H"

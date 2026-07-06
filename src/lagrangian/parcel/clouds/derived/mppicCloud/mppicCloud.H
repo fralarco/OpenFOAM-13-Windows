@@ -33,8 +33,8 @@ Description
 #define mppicCloud_H
 
 #include "ParcelCloudBaseTempl.H"
-#include "MomentumCloud.H"
-#include "MPPICCloud.H"
+#include "MomentumCloudTempl.H"
+#include "MPPICCloudTempl.H"
 #include "ParcelCloudTempl.H"
 #include "mppicParcel.H"
 

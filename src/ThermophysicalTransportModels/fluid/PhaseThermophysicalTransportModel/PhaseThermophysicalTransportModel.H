@@ -35,7 +35,7 @@ SourceFiles
 #ifndef PhaseThermophysicalTransportModel_H
 #define PhaseThermophysicalTransportModel_H
 
-#include "ThermophysicalTransportModel.H"
+#include "ThermophysicalTransportModelTempl.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

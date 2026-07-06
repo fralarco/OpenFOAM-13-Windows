@@ -24,7 +24,7 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "LduMatrixTempl.H"
-#include "LduInterfaceFieldPtrsList.H"
+#include "LduInterfaceFieldPtrsListTempl.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

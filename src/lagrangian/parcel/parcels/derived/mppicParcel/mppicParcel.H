@@ -37,8 +37,8 @@ SourceFiles
 
 #include "contiguous.H"
 #include "particle.H"
-#include "MomentumParcel.H"
-#include "MPPICParcel.H"
+#include "MomentumParcelTempl.H"
+#include "MPPICParcelTempl.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

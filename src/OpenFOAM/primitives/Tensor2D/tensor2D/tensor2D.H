@@ -35,7 +35,7 @@ SourceFiles
 #ifndef tensor2D_H
 #define tensor2D_H
 
-#include "Tensor2D.H"
+#include "Tensor2DTempl.H"
 #include "vector2D.H"
 #include "contiguous.H"
 

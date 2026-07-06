@@ -35,7 +35,7 @@ SourceFiles
 #ifndef coupledFvPatchField_H
 #define coupledFvPatchField_H
 
-#include "LduInterfaceField.H"
+#include "LduInterfaceFieldTempl.H"
 #include "fvPatchField.H"
 #include "coupledFvPatch.H"
 

@@ -33,7 +33,7 @@ Description
 #define barycentric_H
 
 #include "scalar.H"
-#include "Barycentric.H"
+#include "BarycentricTempl.H"
 #include "contiguous.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

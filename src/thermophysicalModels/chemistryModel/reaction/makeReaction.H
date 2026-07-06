@@ -32,7 +32,7 @@ Description
 #ifndef makeReaction_H
 #define makeReaction_H
 
-#include "Reaction.H"
+#include "ReactionTempl.H"
 
 #include "IrreversibleReaction.H"
 #include "ReversibleReaction.H"

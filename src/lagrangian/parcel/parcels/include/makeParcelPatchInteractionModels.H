@@ -29,7 +29,7 @@ License
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #include "LocalInteraction.H"
-#include "NoInteraction.H"
+#include "NoInteractionTempl.H"
 #include "Rebound.H"
 #include "StandardWallInteraction.H"
 
