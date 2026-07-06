@@ -200,6 +200,14 @@ endif
 all: $(EXE)
 	@:
 
+ifeq ($(WM_ARCH),mingw_w64)
+# The per-source object rules generated earlier via $(eval) (before this point)
+# would otherwise hijack GNU make's default goal to the first .o target, so an
+# executable build (invoked with no explicit target) compiles the first object
+# and stops without linking. Restore 'all' as the default goal.
+.DEFAULT_GOAL := all
+endif
+
 .PHONY: silent
 silent:
 	@:
@@ -239,6 +247,11 @@ ifeq ($(WM_ARCH),mingw_w64)
 ifneq ($(notdir $(LIB)),libOpenFOAM)
     MINGW_PROJECT_LIBS = $(PROJECT_LIBS)
 endif
+# GNU make's $(file >$(LIB).objs) response-file write is expanded before the
+# makeTargetDir recipe line runs, so pre-create the LIB output dir here (parse
+# time). Needed when LIB has a subdir that does not pre-exist, e.g. the dummy
+# Pstream lib -> $(FOAM_LIBBIN)/dummy/libPstream.
+$(shell mkdir -p $(dir $(LIB)))
 endif
 
 $(LIB).$(SO): $(OBJECTS)
