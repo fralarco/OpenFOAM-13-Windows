@@ -39,7 +39,7 @@ SourceFiles
 #define multicomponentThermo_H
 
 #include "basicThermo.H"
-#include "MulticomponentThermo.H"
+#include "MulticomponentThermoTempl.H"
 #include "speciesTable.H"
 #include "DimensionedFieldListSlicer.H"
 #include "GeometricFieldListSlicer.H"

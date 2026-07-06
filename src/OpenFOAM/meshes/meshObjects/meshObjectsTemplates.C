@@ -24,7 +24,7 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "meshObjects.H"
-#include "MeshObjects.H"
+#include "MeshObjectsTempl.H"
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 

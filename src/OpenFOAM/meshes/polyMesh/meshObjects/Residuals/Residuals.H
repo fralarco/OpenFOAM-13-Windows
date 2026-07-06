@@ -29,7 +29,7 @@ Description
     the fields of the type it is instantiated on.
 
 SourceFiles
-    Residuals.C
+    ResidualsTempl.C
 
 \*---------------------------------------------------------------------------*/
 
@@ -144,7 +144,7 @@ public:
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #ifdef NoRepository
-    #include "Residuals.C"
+    #include "ResidualsTempl.C"
 #endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

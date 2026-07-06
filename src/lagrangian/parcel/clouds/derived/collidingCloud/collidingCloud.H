@@ -32,10 +32,10 @@ Description
 #ifndef collidingCloud_H
 #define collidingCloud_H
 
-#include "ParcelCloudBase.H"
+#include "ParcelCloudBaseTempl.H"
 #include "MomentumCloud.H"
 #include "CollidingCloud.H"
-#include "ParcelCloud.H"
+#include "ParcelCloudTempl.H"
 #include "collidingParcel.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

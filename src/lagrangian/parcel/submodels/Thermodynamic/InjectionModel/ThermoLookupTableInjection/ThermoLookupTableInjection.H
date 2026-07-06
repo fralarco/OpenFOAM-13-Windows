@@ -52,7 +52,7 @@ SourceFiles
 #ifndef ThermoLookupTableInjection_H
 #define ThermoLookupTableInjection_H
 
-#include "InjectionModel.H"
+#include "InjectionModelTempl.H"
 #include "thermoParcelInjectionDataIOList.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

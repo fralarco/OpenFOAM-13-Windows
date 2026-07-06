@@ -47,7 +47,7 @@ SourceFiles
 #ifndef PatchFlowRateInjection_H
 #define PatchFlowRateInjection_H
 
-#include "InjectionModel.H"
+#include "InjectionModelTempl.H"
 #include "patchInjectionBase.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

@@ -32,7 +32,7 @@ Description
 #ifndef uindirectPrimitiveOldTimePatch_H
 #define uindirectPrimitiveOldTimePatch_H
 
-#include "PrimitiveOldTimePatch.H"
+#include "PrimitiveOldTimePatchTempl.H"
 #include "face.H"
 #include "UIndirectList.H"
 #include "pointField.H"
