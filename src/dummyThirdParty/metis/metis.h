@@ -6,6 +6,12 @@
  *     decompositionMethods/metis/Make/options
  */
 
+#if defined(_WIN32)
+/* MinGW: int32_t/int64_t used below are not implicitly visible as they are
+ * via glibc on Linux; pull in the standard fixed-width integer types. */
+#include <stdint.h>
+#endif
+
 #warning "Dummy metis.h - gets included since it cannot find metis installation."
 
 #define IDXTYPEWIDTH 32

@@ -1,5 +1,5 @@
 codedFunctionObject/codedFunctionObject.C
-residuals/residuals.C
+residuals/residualsFvObject.C
 timeActivatedFileUpdate/timeActivatedFileUpdate.C
 timeStep/timeStepFunctionObject.C
 userTimeStep/userTimeStepFunctionObject.C

@@ -23,7 +23,7 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "residuals.H"
+#include "residualsFvObject.H"
 #include "volFields.H"
 #include "Residuals.H"
 #include "ListOps.H"

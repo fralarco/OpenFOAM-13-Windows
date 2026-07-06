@@ -6,9 +6,9 @@ heatTransfer/heatTransfer.C
 heatTransfer/heatTransferAv/heatTransferAv.C
 
 heatTransferCoefficientModels/heatTransferCoefficientModel/heatTransferCoefficientModel.C
-heatTransferCoefficientModels/constant/constant.C
-heatTransferCoefficientModels/function1/function1.C
-heatTransferCoefficientModels/function2/function2.C
+heatTransferCoefficientModels/constant/htcConstant.C
+heatTransferCoefficientModels/function1/htcFunction1.C
+heatTransferCoefficientModels/function2/htcFunction2.C
 heatTransferCoefficientModels/variable/variable.C
 
 LIB = $(FOAM_LIBBIN)/libinterRegionFvModels
