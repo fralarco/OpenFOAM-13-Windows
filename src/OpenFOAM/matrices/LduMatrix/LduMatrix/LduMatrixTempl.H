@@ -37,13 +37,13 @@ Description
         matrices.
 
 SourceFiles
-    LduMatrixATmul.C
-    LduMatrix.C
-    LduMatrixOperations.C
-    LduMatrixSolver.C
-    LduMatrixPreconditioner.C
+    LduMatrixATmulTempl.C
+    LduMatrixTempl.C
+    LduMatrixOperationsTempl.C
+    LduMatrixSolverTempl.C
+    LduMatrixPreconditionerTempl.C
     LduMatrixTests.C
-    LduMatrixUpdateMatrixInterfaces.C
+    LduMatrixUpdateMatrixInterfacesTempl.C
 
 \*---------------------------------------------------------------------------*/
 
@@ -825,7 +825,7 @@ LduMatrix<Type, DType, LUType>::solver::                                       \
 
 #ifdef NoRepository
     #include "LduMatrixI.H"
-    #include "LduMatrix.C"
+    #include "LduMatrixTempl.C"
 #endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

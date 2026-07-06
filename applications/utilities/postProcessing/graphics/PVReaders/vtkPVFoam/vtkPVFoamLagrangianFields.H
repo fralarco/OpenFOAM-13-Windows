@@ -36,7 +36,7 @@ InClass
 // OpenFOAM includes
 #include "LagrangianFields.H"
 #include "lagrangianFieldReconstructor.H"
-#include "LagrangianFieldReconstructor.H"
+#include "LagrangianFwkFieldReconstructor.H"
 
 // VTK includes
 #include "vtkFloatArray.h"

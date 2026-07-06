@@ -52,7 +52,7 @@ SourceFiles
 #define MomentumCloud_H
 
 #include "particle.H"
-#include "Cloud.H"
+#include "CloudTempl.H"
 #include "timeIOdictionary.H"
 #include "autoPtr.H"
 #include "randomGenerator.H"

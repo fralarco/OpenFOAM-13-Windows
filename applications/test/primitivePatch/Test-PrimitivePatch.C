@@ -26,7 +26,7 @@ Description
 
 \*---------------------------------------------------------------------------*/
 
-#include "PrimitivePatch.H"
+#include "PrimitivePatchTempl.H"
 #include "argList.H"
 #include "Time.H"
 #include "polyMesh.H"

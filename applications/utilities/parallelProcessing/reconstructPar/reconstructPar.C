@@ -38,7 +38,7 @@ Description
 #include "fvFieldReconstructor.H"
 #include "pointFieldReconstructor.H"
 #include "lagrangianFieldReconstructor.H"
-#include "LagrangianFieldReconstructor.H"
+#include "LagrangianFwkFieldReconstructor.H"
 
 using namespace Foam;
 

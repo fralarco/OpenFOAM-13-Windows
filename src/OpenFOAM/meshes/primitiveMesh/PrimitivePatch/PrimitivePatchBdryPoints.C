@@ -23,7 +23,7 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "PrimitivePatch.H"
+#include "PrimitivePatchTempl.H"
 #include "HashSet.H"
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //

@@ -32,7 +32,7 @@ Description
 #ifndef primitiveFacePatch_H
 #define primitiveFacePatch_H
 
-#include "PrimitivePatch.H"
+#include "PrimitivePatchTempl.H"
 #include "face.H"
 #include "List.H"
 #include "pointField.H"

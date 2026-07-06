@@ -34,7 +34,7 @@ Description
 #ifndef ParcelCloudBase_H
 #define ParcelCloudBase_H
 
-#include "Cloud.H"
+#include "CloudTempl.H"
 #include "parcelCloudBase.H"
 #include "fvMatrices.H"
 

@@ -39,7 +39,7 @@ SourceFiles
 
 #include "surfaceRegistry.H"
 #include "MeshedSurfaceIOAllocator.H"
-#include "PrimitivePatch.H"
+#include "PrimitivePatchTempl.H"
 #include "SubField.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

@@ -36,7 +36,7 @@ SourceFiles
 #define findCellParticle_H
 
 #include "particle.H"
-#include "Cloud.H"
+#include "CloudTempl.H"
 #include "autoPtr.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

@@ -34,7 +34,7 @@ SourceFiles
 #ifndef PrimitiveOldTimePatch_H
 #define PrimitiveOldTimePatch_H
 
-#include "PrimitivePatch.H"
+#include "PrimitivePatchTempl.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

@@ -29,7 +29,7 @@ Typedef
 #ifndef primitiveTriPatch_H
 #define primitiveTriPatch_H
 
-#include "PrimitivePatch.H"
+#include "PrimitivePatchTempl.H"
 #include "triFace.H"
 #include "List.H"
 #include "pointField.H"

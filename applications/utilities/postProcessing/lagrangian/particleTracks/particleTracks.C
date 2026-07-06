@@ -31,7 +31,7 @@ Description
 \*---------------------------------------------------------------------------*/
 
 #include "argList.H"
-#include "Cloud.H"
+#include "CloudTempl.H"
 #include "IOdictionary.H"
 #include "fvMesh.H"
 #include "Time.H"

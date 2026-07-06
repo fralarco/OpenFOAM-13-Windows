@@ -37,7 +37,7 @@ SourceFiles
 #define repatchMesh_H
 
 #include "repatchPatch.H"
-#include "PrimitivePatch.H"
+#include "PrimitivePatchTempl.H"
 #include "PtrList.H"
 #include "polyPatchList.H"
 #include "className.H"
