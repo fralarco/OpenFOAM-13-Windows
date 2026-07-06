@@ -4,13 +4,13 @@ EXE_INC = \
     -I$(LIB_SRC)/parallel/parallel/lnInclude \
     -I$(LIB_SRC)/tracking/lnInclude \
     -I$(LIB_SRC)/lagrangian/basic/lnInclude \
-    -I$(LIB_SRC)/Lagrangian/Lagrangian/lnInclude
+    -I$(LIB_SRC)/LagrangianFwk/Lagrangian/lnInclude
 
 EXE_LIBS = \
     -lfiniteVolume \
     -lmeshTools \
     -lparallel \
     -llagrangian \
-    -lLagrangian \
+    -lLagrangianFwk \
     -lgenericFvFields \
     -lgenericLagrangianFields

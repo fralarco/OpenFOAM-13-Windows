@@ -5,7 +5,7 @@ EXE_INC = \
     -I$(LIB_SRC)/polyTopoChange/lnInclude \
     -I$(LIB_SRC)/tracking/lnInclude \
     -I$(LIB_SRC)/lagrangian/basic/lnInclude \
-    -I$(LIB_SRC)/Lagrangian/Lagrangian/lnInclude
+    -I$(LIB_SRC)/LagrangianFwk/Lagrangian/lnInclude
 
 LIB_LIBS = \
     -lfiniteVolume \
@@ -13,4 +13,4 @@ LIB_LIBS = \
     -ldecompositionMethods -L$(FOAM_LIBBIN)/dummy -lmetisDecomp -lscotchDecomp \
     -lpolyTopoChange \
     -llagrangian \
-    -lLagrangian
+    -lLagrangianFwk
