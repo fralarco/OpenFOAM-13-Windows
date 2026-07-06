@@ -126,16 +126,20 @@ ifeq ($(WM_ARCH),mingw_w64)
 # object paths past MAX_PATH (260) on a normal checkout (measured 290). Here
 # each source's object/dep goes to
 #     platforms/<WM_OPTIONS>/obj/<H>/<basename>.o
-# where H = sha1(abs source dir)[:16] — stable, and collision-free because
-# basenames within one directory are already unique. This removes the need
-# for subst O:/junctions/LongPathsEnabled. A make pattern rule cannot express
-# the directory remap (the object stem no longer carries the source subdir),
-# so explicit per-source compile+dep rules are generated below.
+# where H = sha1(OBJECTS_DIR | abs source dir)[:16] — stable, and collision-free
+# because basenames within one directory are already unique. OBJECTS_DIR (unique
+# per build target) is part of the hash so a source directory built by two
+# targets (e.g. PDRFoam compiles ignition/*.C directly while the ignition dir
+# also builds libXiIgnition) gets a distinct object/dep dir per target, matching
+# upstream's per-target obj tree and avoiding cross-target .dep path clashes.
+# This removes the need for subst O:/junctions/LongPathsEnabled. A make pattern
+# rule cannot express the directory remap (the object stem no longer carries the
+# source subdir), so explicit per-source compile+dep rules are generated below.
 #------------------------------------------------------------------------------
 WIN_OBJ_ROOT := $(WM_PROJECT_DIR)/platforms/$(WM_OPTIONS)/obj
 _winSrcDirs := $(sort $(dir $(SOURCE)))
 $(foreach d,$(_winSrcDirs),\
-  $(eval _winH_$(d) := $(shell printf '%s' '$(abspath $(d))' | sha1sum | cut -c1-16)))
+  $(eval _winH_$(d) := $(shell printf '%s' '$(OBJECTS_DIR)|$(abspath $(d))' | sha1sum | cut -c1-16)))
 winObjDir = $(WIN_OBJ_ROOT)/$(_winH_$(dir $(1)))
 
 OBJECTS := $(foreach s,$(SOURCE),$(call winObjDir,$s)/$(notdir $(basename $s)).o)
