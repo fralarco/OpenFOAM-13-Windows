@@ -167,15 +167,18 @@ endif
 #------------------------------------------------------------------------------
 
 ifeq ($(WM_ARCH),mingw_w64)
-# On a case-insensitive NTFS build directory, OpenFOAM headers whose
-# basenames collide case-insensitively with C/C++ system headers
-# (notably string.H <-> <string.h>) would shadow the system header, because
-# -I directories are searched for BOTH "" and <> includes. Use -iquote for
-# OpenFOAM's own directories: they are then searched for "" includes only,
-# leaving <string.h>/<cstring>/<fstream> to resolve to the real system
-# headers. GINC/SYS_INC (ThirdParty/system) keep -I.
+# On a case-insensitive NTFS build directory, OpenFOAM's own core headers whose
+# basenames collide case-insensitively with C/C++ system headers (notably
+# string.H <-> <string.h>) would shadow the system header, because -I dirs are
+# searched for BOTH "" and <> includes. Use -iquote for the project's own
+# include dirs (own lnInclude, ., and PROJECT_INC = OpenFOAM/OSspecific core
+# lnInclude): they are then searched for "" includes only, leaving
+# <string.h>/<cstring>/<fstream> to resolve to the real system headers.
+# EXE_INC keeps -I: apps legitimately pull vendored <>-style headers through it
+# (e.g. chemkinReader includes <FlexLexer.h> from wmake/rules/.../include), and
+# the shadowing core headers live in PROJECT_INC, not EXE_INC.
 LIB_HEADER_DIRS = \
-        $(patsubst -I%,-iquote %,$(EXE_INC)) \
+        $(EXE_INC) \
         -iquote lnInclude \
         -iquote . \
         $(patsubst -I%,-iquote %,$(PROJECT_INC)) \

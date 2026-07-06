@@ -23,7 +23,7 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "metis.H"
+#include "metisDecomp.H"
 #include "Time.H"
 #include "addToRunTimeSelectionTable.H"
 
