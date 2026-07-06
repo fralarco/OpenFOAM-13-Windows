@@ -5,3 +5,16 @@ EXE_INC = \
 
 EXE_LIBS = \
     -lchemistryModel
+
+ifeq ($(WM_ARCH),mingw_w64)
+    # chemkinReader.H includes <FlexLexer.h> in a normal TU (not just the
+    # flex-generated source); point at the vendored copy in the mingw rules
+    # (same header the flex++ rule uses), not MSYS2's Cygwin-tree /usr/include
+    EXE_INC += -I$(WM_DIR)/rules/$(WM_ARCH)$(WM_COMPILER)/include
+endif
+
+ifeq ($(WM_ARCH),mingw_w64)
+    # PE/COFF requires explicit link closure for directly
+    # referenced symbols; ELF resolves them at load time
+    EXE_LIBS += -lspecie
+endif

@@ -20,3 +20,9 @@ EXE_LIBS = \
     -lfileFormats \
     -lpolyTopoChange \
     -lsnappyHexMesh
+
+ifeq ($(WM_ARCH),mingw_w64)
+    # PE/COFF requires explicit link closure: triSurface field typeNames
+    # (DimensionedField<..., triSurfacePointGeoMesh>) live in libtriSurface
+    EXE_LIBS += -ltriSurface
+endif

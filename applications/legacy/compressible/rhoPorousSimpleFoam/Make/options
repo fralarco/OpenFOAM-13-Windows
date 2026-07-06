@@ -24,3 +24,9 @@ EXE_LIBS = \
     -lmeshTools \
     -lfvModels \
     -lfvConstraints
+
+ifeq ($(WM_ARCH),mingw_w64)
+    # PE/COFF requires explicit link closure for directly
+    # referenced symbols; ELF resolves them at load time
+    EXE_LIBS += -lfluidThermoThermophysicalTransportModels
+endif

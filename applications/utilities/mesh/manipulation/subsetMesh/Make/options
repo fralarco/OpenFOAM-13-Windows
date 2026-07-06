@@ -12,3 +12,9 @@ ifeq ($(WM_ARCH),mingw_w64)
     # referenced symbols; ELF resolves them at load time
     EXE_LIBS += -lfiniteVolume
 endif
+
+ifeq ($(WM_ARCH),mingw_w64)
+    # PE/COFF requires explicit link closure for directly
+    # referenced symbols; ELF resolves them at load time
+    EXE_LIBS += -lmeshTools
+endif
