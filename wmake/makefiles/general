@@ -166,6 +166,22 @@ endif
 # Set header file include paths
 #------------------------------------------------------------------------------
 
+ifeq ($(WM_ARCH),mingw_w64)
+# On a case-insensitive NTFS build directory, OpenFOAM headers whose
+# basenames collide case-insensitively with C/C++ system headers
+# (notably string.H <-> <string.h>) would shadow the system header, because
+# -I directories are searched for BOTH "" and <> includes. Use -iquote for
+# OpenFOAM's own directories: they are then searched for "" includes only,
+# leaving <string.h>/<cstring>/<fstream> to resolve to the real system
+# headers. GINC/SYS_INC (ThirdParty/system) keep -I.
+LIB_HEADER_DIRS = \
+        $(patsubst -I%,-iquote %,$(EXE_INC)) \
+        -iquote lnInclude \
+        -iquote . \
+        $(patsubst -I%,-iquote %,$(PROJECT_INC)) \
+        $(GINC) \
+        $(SYS_INC)
+else
 LIB_HEADER_DIRS = \
         $(EXE_INC) \
         -IlnInclude \
@@ -173,6 +189,7 @@ LIB_HEADER_DIRS = \
         $(PROJECT_INC) \
         $(GINC) \
         $(SYS_INC)
+endif
 
 
 #------------------------------------------------------------------------------
