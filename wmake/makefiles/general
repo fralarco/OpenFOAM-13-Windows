@@ -118,9 +118,48 @@ include $(GENERAL_RULES)/transform
 #------------------------------------------------------------------------------
 
 include $(FILES)
+
+ifeq ($(WM_ARCH),mingw_w64)
+#------------------------------------------------------------------------------
+# Windows: short hashed object/dependency directories.
+# The upstream scheme mirrors the full source tree under platforms/, pushing
+# object paths past MAX_PATH (260) on a normal checkout (measured 290). Here
+# each source's object/dep goes to
+#     platforms/<WM_OPTIONS>/obj/<H>/<basename>.o
+# where H = sha1(abs source dir)[:16] — stable, and collision-free because
+# basenames within one directory are already unique. This removes the need
+# for subst O:/junctions/LongPathsEnabled. A make pattern rule cannot express
+# the directory remap (the object stem no longer carries the source subdir),
+# so explicit per-source compile+dep rules are generated below.
+#------------------------------------------------------------------------------
+WIN_OBJ_ROOT := $(WM_PROJECT_DIR)/platforms/$(WM_OPTIONS)/obj
+_winSrcDirs := $(sort $(dir $(SOURCE)))
+$(foreach d,$(_winSrcDirs),\
+  $(eval _winH_$(d) := $(shell printf '%s' '$(abspath $(d))' | sha1sum | cut -c1-16)))
+winObjDir = $(WIN_OBJ_ROOT)/$(_winH_$(dir $(1)))
+
+OBJECTS := $(foreach s,$(SOURCE),$(call winObjDir,$s)/$(notdir $(basename $s)).o)
+DEPENDENCIES := $(foreach s,$(SOURCE),$(call winObjDir,$s)/$(notdir $s).dep)
+
+define WIN_SRC_RULES
+$(call winObjDir,$1)/$(notdir $(basename $1)).o: $1 $(call winObjDir,$1)/$(notdir $1).dep
+	@$(WM_SCRIPTS)/makeTargetDir $$@
+	$(call QUIET_MESSAGE,$(subst .,,$(suffix $1))too,$(notdir $1))
+	$E $$($(subst .,,$(suffix $1))too)
+$(call winObjDir,$1)/$(notdir $1).dep: $1
+	@$(WM_SCRIPTS)/makeTargetDir $$@
+	$(call QUIET_MESSAGE,wmkdep,$(notdir $1))
+	@$(WMAKE_BIN)/wmkdep \
+		-R '$(WIN_OBJ_ROOT)/' '$$$$(WIN_OBJ_ROOT)/' \
+		-R '$(WM_PROJECT_DIR)/' '$$$$(WM_PROJECT_DIR)/' \
+		$(LIB_HEADER_DIRS) $$< $$@
+endef
+$(foreach s,$(SOURCE),$(eval $(call WIN_SRC_RULES,$s)))
+else
 DEPENDENCIES=$(SOURCE:%=$(OBJECTS_DIR)/%.dep)
 BASENAMES=$(basename $(SOURCE))
 OBJECTS=$(BASENAMES:%=$(OBJECTS_DIR)/%.o)
+endif
 
 
 #------------------------------------------------------------------------------
@@ -238,7 +277,9 @@ lnInclude: $(MAKE_DIR)/files $(OPTIONS)
 #------------------------------------------------------------------------------
 
 $(OBJECTS): $(OPTIONS)
+ifneq ($(WM_ARCH),mingw_w64)
 $(foreach S,$(SOURCE),$(eval $(OBJECTS_DIR)/$(basename $S).o : $(OBJECTS_DIR)/$S.dep))
+endif
 
 
 #------------------------------------------------------------------------------
