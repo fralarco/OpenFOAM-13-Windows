@@ -1,0 +1,15 @@
+# Microsoft MPI (MS-MPI) for native Windows MinGW-w64.
+#
+# Selected with WM_MPLIB=MSMPI. Requires:
+#  - MSMPI_INC : the MS-MPI SDK Include directory (set by msmpisdk.msi); it
+#                provides mpi.h / mpif.h.
+#  - libmsmpi.a: a MinGW import library generated from the MS-MPI runtime
+#                msmpi.dll (setup_msmpi.sh: dlltool -d <sdk>/msmpi.def), placed
+#                under $(WM_THIRD_PARTY_DIR)/msmpi/lib. The SDK's msmpi.lib is an
+#                MSVC import library and is not used directly by GCC/ld.
+#
+# MPICH_SKIP_MPICXX/OMPI_SKIP_MPICXX keep the C++ MPI bindings out (OpenFOAM
+# uses the C API), matching the other mplib rules.
+PFLAGS     = -DMPICH_SKIP_MPICXX -DOMPI_SKIP_MPICXX
+PINC       = -isystem "$(MSMPI_INC)"
+PLIBS      = -L"$(WM_THIRD_PARTY_DIR)/msmpi/lib" -lmsmpi -lpthread
