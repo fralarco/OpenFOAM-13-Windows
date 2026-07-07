@@ -171,18 +171,21 @@ endif
 #------------------------------------------------------------------------------
 
 ifeq ($(WM_ARCH),mingw_w64)
-# On a case-insensitive NTFS build directory, OpenFOAM's own core headers whose
-# basenames collide case-insensitively with C/C++ system headers (notably
-# string.H <-> <string.h>) would shadow the system header, because -I dirs are
-# searched for BOTH "" and <> includes. Use -iquote for the project's own
-# include dirs (own lnInclude, ., and PROJECT_INC = OpenFOAM/OSspecific core
-# lnInclude): they are then searched for "" includes only, leaving
-# <string.h>/<cstring>/<fstream> to resolve to the real system headers.
-# EXE_INC keeps -I: apps legitimately pull vendored <>-style headers through it
-# (e.g. chemkinReader includes <FlexLexer.h> from wmake/rules/.../include), and
-# the shadowing core headers live in PROJECT_INC, not EXE_INC.
+# On a case-insensitive NTFS build directory, an OpenFOAM header whose basename
+# collides case-insensitively with a C/C++ system header pulled via <> would
+# shadow the system header, because -I dirs are searched for BOTH "" and <>
+# includes. Two shadow classes were observed: core headers (string.H<->string.h,
+# via PROJECT_INC) and other libraries' lnInclude headers reached through
+# EXE_INC (a <> include buried in a finiteVolume header resolving to an OpenFOAM
+# header, breaking e.g. fvc in PecletNo). So use -iquote for ALL of OpenFOAM's
+# own include dirs -- EXE_INC, own lnInclude, ., and PROJECT_INC -- searching
+# them for "" includes only and leaving <> to resolve to real system headers.
+# The one legitimate <>-style project include, the vendored FlexLexer.h used by
+# chemkinReader, is placed on SYS_INC (kept as -I) so <FlexLexer.h> still
+# resolves for both chemkinReader.H and the flex-generated lexer.
+SYS_INC += -I$(WM_DIR)/rules/$(WM_ARCH)$(WM_COMPILER)/include
 LIB_HEADER_DIRS = \
-        $(EXE_INC) \
+        $(patsubst -I%,-iquote %,$(EXE_INC)) \
         -iquote lnInclude \
         -iquote . \
         $(patsubst -I%,-iquote %,$(PROJECT_INC)) \
