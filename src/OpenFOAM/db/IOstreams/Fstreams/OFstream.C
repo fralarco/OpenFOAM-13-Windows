@@ -58,6 +58,13 @@ Foam::OFstreamAllocator::OFstreamAllocator
     {
         mode |= ofstream::app;
     }
+    #if defined(_WIN32)
+    // Windows text-mode streams translate '\n' <-> '\r\n', which corrupts
+    // OpenFOAM binary-format data blocks (faceCompactList, fields, ...). Open in
+    // binary mode; OpenFOAM writes its own '\n' line endings so ASCII output is
+    // unaffected. No behavioural difference on POSIX.
+    mode |= ofstream::binary;
+    #endif
 
     if (compression == IOstream::COMPRESSED)
     {

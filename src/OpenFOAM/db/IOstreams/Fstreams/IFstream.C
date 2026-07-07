@@ -50,7 +50,13 @@ Foam::IFstreamAllocator::IFstreamAllocator(const fileName& filePath)
         }
     }
 
+    #if defined(_WIN32)
+    // Read in binary mode: Windows text mode strips '\r' and mangles binary
+    // data blocks; OpenFOAM uses '\n' line endings so ASCII input is unaffected.
+    ifPtr_ = new ifstream(filePath.c_str(), std::ios_base::binary);
+    #else
     ifPtr_ = new ifstream(filePath.c_str());
+    #endif
 
     // If the file is compressed, decompress it before reading.
     if (!ifPtr_->good())
@@ -75,7 +81,11 @@ Foam::IFstreamAllocator::IFstreamAllocator(const fileName& filePath)
         {
             delete ifPtr_;
 
+            #if defined(_WIN32)
+            ifPtr_ = new ifstream((filePath + ".orig").c_str(), std::ios_base::binary);
+            #else
             ifPtr_ = new ifstream((filePath + ".orig").c_str());
+            #endif
         }
     }
 }
