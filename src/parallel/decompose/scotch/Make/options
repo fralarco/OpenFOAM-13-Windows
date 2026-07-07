@@ -16,3 +16,9 @@ LIB_LIBS = \
     -lscotch \
     -lscotcherrexit \
     $(if $(filter mingw_w64,$(WM_ARCH)),-lpthread,-lrt)
+
+# PE/COFF has no lazy symbol resolution: the decompositionMethod base class
+# (and libOpenFOAM) must be linked explicitly. ELF resolves these at load time.
+ifeq ($(WM_ARCH),mingw_w64)
+LIB_LIBS += -ldecompositionMethods
+endif
