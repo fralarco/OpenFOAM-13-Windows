@@ -170,10 +170,21 @@ runParallel()
              "remove log file 'log.$LOG_SUFFIX' to re-run"
     else
         echo "Running $APP_RUN in parallel on $PWD using $nProcs processes"
-        if [ "$LOG_APPEND" = "true" ]; then
-            ( mpirun -np $nProcs $APP_RUN -parallel "$@" < /dev/null >> log.$LOG_SUFFIX 2>&1 )
+        # MPI launcher. OpenMPI (Linux) uses `mpirun -np`; native Windows uses
+        # Microsoft MPI, which provides `mpiexec -n` (no mpirun). Preserve Linux
+        # behaviour; only switch on the mingw_w64 build. Honour an explicit
+        # override via $FOAM_MPIRUN for other setups.
+        if [ -n "${FOAM_MPIRUN:-}" ]; then
+            mpiLauncher="$FOAM_MPIRUN"
+        elif [ "$WM_ARCH" = "mingw_w64" ]; then
+            mpiLauncher="mpiexec -n"
         else
-            ( mpirun -np $nProcs $APP_RUN -parallel "$@" < /dev/null > log.$LOG_SUFFIX 2>&1 )
+            mpiLauncher="mpirun -np"
+        fi
+        if [ "$LOG_APPEND" = "true" ]; then
+            ( $mpiLauncher $nProcs $APP_RUN -parallel "$@" < /dev/null >> log.$LOG_SUFFIX 2>&1 )
+        else
+            ( $mpiLauncher $nProcs $APP_RUN -parallel "$@" < /dev/null > log.$LOG_SUFFIX 2>&1 )
         fi
     fi
 }
