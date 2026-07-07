@@ -15,4 +15,4 @@ LIB_LIBS = \
     -L$(FOAM_EXT_LIBBIN) \
     -lscotch \
     -lscotcherrexit \
-    -lrt
+    $(if $(filter mingw_w64,$(WM_ARCH)),-lpthread,-lrt)
