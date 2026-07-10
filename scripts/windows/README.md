@@ -23,20 +23,44 @@ not required to be `C:\OF13WinNormal`:
 `env.sh` is sourced by every script and exports the full `WM_*`/`FOAM_*`
 environment from the above.
 
+## The OpenFOAM 13 Windows Shell (day-to-day use)
+
+For interactive use, don't source scripts by hand — launch the ready-made
+environment. Double-click **`OpenFOAM-13-Windows-Shell.cmd`** (or run
+**`OpenFOAM-13-Windows-Shell.ps1`**). It opens an MSYS2 **UCRT64** terminal with
+the OpenFOAM environment loaded: a banner, the `OF13-Windows` prompt, and
+`$FOAM_RUN` created and entered. Configure `MSYS2_ROOT` (default `C:\msys64`) and
+`OF13_ROOT` (default `C:\OF13WinNormal`) via the environment before launching.
+Inside, run a case the standard OpenFOAM way:
+
+```sh
+cd $FOAM_RUN
+cp -r $FOAM_TUTORIALS/incompressibleFluid/pitzDaily .
+cd pitzDaily && ./Allrun
+```
+
 ## Files
 
 | File | What it does |
 | --- | --- |
+| `OpenFOAM-13-Windows-Shell.cmd` | double-click launcher: opens a UCRT64 shell with the OpenFOAM environment ready |
+| `OpenFOAM-13-Windows-Shell.ps1` | PowerShell equivalent of the `.cmd` launcher |
+| `openfoam_shell.sh` | rcfile the launchers source (loads `env.sh`, banner, prompt, `$FOAM_RUN`) |
 | `env.sh` | the shared build/run environment (source this) |
 | `run_global_build.sh` | full src+apps build (`CLEAN=1` purges first) + inventory |
 | `global_build_inventory.py` | per-target artifact inventory → JSON |
-| `run_serial.sh` | blockMesh→checkMesh→foamRun on pitzDaily (serial smoke) |
+| `run_serial.sh` | **validation smoke test**: blockMesh→checkMesh→foamRun on pitzDaily |
 | `build_scotch.sh` | build ThirdParty Scotch 7.0.8 (static, MinGW) |
 | `scotch/Makefile.inc` | the MinGW Scotch config (copy into scotch src) |
 | `run_decompose.sh` | decomposePar with the `scotch` method (2 subdomains) |
 | `setup_msmpi.sh` | make `libmsmpi.a` from the MS-MPI SDK |
 | `build_pstream_mpi.sh` | build `lib/msmpi/libPstream.dll` (`WM_MPLIB=MSMPI`) |
-| `run_parallel.sh` | `mpiexec -n 2 foamRun -parallel` on the decomposed case |
+| `run_parallel.sh` | **validation smoke test**: `mpiexec -n 2 foamRun -parallel` on the decomposed case |
+
+> `run_serial.sh` and `run_parallel.sh` are **Windows-port validation smoke
+> tests**, not the standard way to run OpenFOAM. They exercise the toolchain
+> end-to-end and print an `..._OK` marker. For real cases use the standard
+> `./Allrun` workflow (below).
 
 ## Typical flows
 

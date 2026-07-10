@@ -40,36 +40,51 @@ CLEAN=1 bash /c/OF13/OpenFOAM-13-Windows/scripts/windows/run_global_build.sh
 
 See [BUILD_WINDOWS.md](BUILD_WINDOWS.md) for details and options.
 
-## Run pitzDaily (serial)
+## OpenFOAM 13 Windows Shell
+
+Double-click **`scripts/windows/OpenFOAM-13-Windows-Shell.cmd`** to open an MSYS2
+UCRT64 terminal with the OpenFOAM environment ready (banner, prompt, `$FOAM_RUN`).
+Change the install location by setting `OF13_ROOT` (default `C:\OF13WinNormal`)
+before launching, e.g. `set OF13_ROOT=C:\OF13` then run the launcher. Verify:
 
 ```sh
-bash scripts/windows/run_serial.sh          # -> SERIAL_PITZDAILY_OK
+echo $WM_PROJECT_DIR
+which foamRun
+foamDictionary -help
 ```
 
-## Run pitzDaily (parallel)
+## Running a case (standard OpenFOAM workflow)
+
+Use the normal OpenFOAM tutorial flow — copy a tutorial and run its `Allrun`:
 
 ```sh
-# once: Scotch + real scotchDecomp
-cp scripts/windows/scotch/Makefile.inc "$OF13_THIRDPARTY/scotch_7.0.8/src/"
-bash scripts/windows/build_scotch.sh
-wmake libso src/parallel/decompose/scotch
-
-# once: MS-MPI (after installing msmpisdk.msi)
-export MSMPI_INC='/c/Program Files (x86)/Microsoft SDKs/MPI/Include'
-bash scripts/windows/setup_msmpi.sh
-bash scripts/windows/build_pstream_mpi.sh
-
-bash scripts/windows/run_parallel.sh        # -> FOAMRUN_PARALLEL_OK
+cd $FOAM_RUN
+cp -r $FOAM_TUTORIALS/incompressibleFluid/pitzDaily .
+cd pitzDaily
+./Allrun            # blockMesh, foamRun, ... via bin/tools/RunFunctions
 ```
 
-## Known limitations
+Parallel tutorials work the same way: `runParallel` in `RunFunctions` uses
+`mpiexec` on Windows (MS-MPI), so `./Allrun` on a parallel case just works. For a
+scotch/MS-MPI parallel case you first build Scotch and the MS-MPI Pstream once
+(see [BUILD_WINDOWS.md](BUILD_WINDOWS.md)).
 
+> **`scripts/windows/run_serial.sh` and `run_parallel.sh` are Windows-port
+> validation smoke tests, not the standard way to run OpenFOAM.** Use them to
+> check the toolchain; use `./Allrun` for real cases.
+
+## Notes and limitations
+
+- **decomposePar** needs **no** manual turbulence libraries: wall-function BCs
+  (`nutkWallFunction`, …) are read through the generic patch-field fallback,
+  exactly as on Linux. A decomposition *method* plugin is still named the normal
+  way, e.g. `libs ("libscotchDecomp.so");` for `method scotch`.
+- **Parallel** uses **MS-MPI** (`mpiexec`). `RunFunctions`' `runParallel` calls
+  `mpiexec` on Windows and keeps `mpirun` on Linux (override via `$FOAM_MPIRUN`).
+  Parallel runs need `MPI_BUFFER_SIZE` set (the shell sets it).
 - Serial and 2-rank parallel are validated; large-scale scaling is not benchmarked.
-- Runtime plugins (decomposition methods, turbulence BCs) must be named via
-  `libs (...)` in the case dictionaries on Windows (`.so` → `.dll` is auto-mapped).
-- Parallel runs require `MPI_BUFFER_SIZE` in the environment.
 - Not built: real metis/ptscotch/zoltan, ParaView/TECIO/ccmio utilities
-  (need their own external SDKs).
+  (they need their own external SDKs).
 
 ## Licensing
 

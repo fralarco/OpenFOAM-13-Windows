@@ -44,14 +44,43 @@ resolution), builds `src` + `applications` in dependency order, and writes an
 artifact inventory. Expect: solvers 5/5, modules 45/45, legacy 15/15, utilities
 133/137, src libraries 104/114.
 
-## 4. Serial run
+## 4. The OpenFOAM 13 Windows Shell
+
+For day-to-day use, launch the ready-made environment instead of sourcing
+scripts by hand. Double-click **`scripts/windows/OpenFOAM-13-Windows-Shell.cmd`**
+(or run `scripts/windows/OpenFOAM-13-Windows-Shell.ps1`). It opens an MSYS2
+**UCRT64** terminal with the OpenFOAM environment loaded (banner, `OF13-Windows`
+prompt, `$FOAM_RUN` created). Configure `MSYS2_ROOT` (default `C:\msys64`) and
+`OF13_ROOT` (default `C:\OF13WinNormal`) via the environment before launching.
+Verify inside the shell:
 
 ```sh
-bash scripts/windows/run_serial.sh
-# blockMesh -> checkMesh -> foamRun on incompressibleFluid/pitzDaily
+echo $WM_PROJECT_DIR
+which foamRun
+foamDictionary -help
 ```
 
-## 5. Scotch decomposition (optional)
+## 5. Running a case (standard OpenFOAM workflow)
+
+Use the normal OpenFOAM flow — copy a tutorial and run its `Allrun`:
+
+```sh
+cd $FOAM_RUN
+cp -r $FOAM_TUTORIALS/incompressibleFluid/pitzDaily .
+cd pitzDaily
+./Allrun
+```
+
+`Allrun` sources `bin/tools/RunFunctions`; `runApplication` runs serial steps and
+`runParallel` runs parallel steps with `mpiexec` on Windows. `Allclean` cleans
+the case.
+
+> **`scripts/windows/run_serial.sh` and `run_parallel.sh` are Windows-port
+> validation smoke tests, not the standard workflow.** They exercise the
+> toolchain end-to-end (e.g. `run_serial.sh` prints `SERIAL_PITZDAILY_OK`); for
+> real cases use `./Allrun`.
+
+## 6. Scotch decomposition (optional)
 
 ```sh
 cp scripts/windows/scotch/Makefile.inc "$OF13_THIRDPARTY/scotch_7.0.8/src/"
@@ -60,7 +89,12 @@ wmake libso src/parallel/decompose/scotch     # real scotchDecomp
 bash scripts/windows/run_decompose.sh         # decomposePar -method scotch
 ```
 
-## 6. Parallel run (MS-MPI)
+`decomposePar` needs no manual turbulence libraries — wall-function BCs
+(`nutkWallFunction`, …) are read via the generic patch-field fallback, as on
+Linux. Only a decomposition *method* plugin is named, e.g.
+`libs ("libscotchDecomp.so");` for `method scotch`.
+
+## 7. Parallel run (MS-MPI)
 
 ```sh
 export MSMPI_INC='/c/Program Files (x86)/Microsoft SDKs/MPI/Include'
