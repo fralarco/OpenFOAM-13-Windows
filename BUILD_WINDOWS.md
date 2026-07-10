@@ -71,9 +71,12 @@ bash scripts/windows/run_parallel.sh          # mpiexec -n 2 foamRun -parallel
 
 Notes:
 - `MPI_BUFFER_SIZE` must be set (the scripts set it).
-- On Windows, name runtime plugin libraries explicitly in the case dictionaries,
-  e.g. `libs ("libscotchDecomp.so" "libmomentumTransportModels.so");`
-  (`.so` → `.dll` is mapped automatically).
+- A runtime-loaded decomposition *method* is named in `decomposeParDict`, e.g.
+  `libs ("libscotchDecomp.so");` for `method scotch` (`.so` → `.dll` is mapped
+  automatically) — the same as on Linux.
+- You do **not** need to add turbulence/model libraries for `decomposePar` to
+  read wall-function BCs (`nutkWallFunction`, …); those are handled by the
+  generic patch-field fallback, exactly as on Linux.
 
 ## Notes on the port
 

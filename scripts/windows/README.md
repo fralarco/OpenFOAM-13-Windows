@@ -65,3 +65,18 @@ bash run_parallel.sh
 The canonical, guarded (`ifeq ($(WM_ARCH),mingw_w64)`) build-system changes live
 in the OpenFOAM tree itself (`wmake/makefiles/general`, `wmake/rules/mingw_w64Gcc/`),
 not here — these scripts only orchestrate.
+
+## Running the standard tutorials (`Allrun` / `RunFunctions`)
+
+OpenFOAM tutorials drive parallel steps through `runParallel` in
+`bin/tools/RunFunctions`, which on Linux calls `mpirun -np N`. Native Windows
+uses **Microsoft MPI**, which ships `mpiexec` (there is no `mpirun`). The port
+adapts `RunFunctions` so that `runParallel` uses **`mpiexec -n N`** when
+`WM_ARCH = mingw_w64` (Linux/OpenMPI keeps `mpirun -np`; an explicit
+`$FOAM_MPIRUN` override is honoured). No per-tutorial edits are needed. Set
+`MPI_BUFFER_SIZE` and put `platforms/<opt>/lib/msmpi` + the MS-MPI `Bin` on
+`PATH` (see `run_parallel.sh`).
+
+Tutorials that use `writeFormat binary` (e.g. motorBike) also rely on the
+binary-mode file-I/O fix in the OpenFOAM tree (`IFstream`/`OFstream` open in
+`std::ios::binary` on Windows, avoiding CRLF corruption of binary data blocks).

@@ -11,12 +11,14 @@ rm -rf "$CASE"; mkdir -p "$(dirname "$CASE")"
 cp -r "$WM_PROJECT_DIR/tutorials/incompressibleFluid/pitzDaily" "$CASE"
 cd "$CASE"
 printf 'FoamFile { format ascii; class dictionary; location "system"; object functions; }\n' > system/functions
-# Runtime plugin libs must be named explicitly on native Windows (.so -> .dll
-# is mapped by OpenFOAM). scotch = decomposer; the turbulence libs register the
-# nut wall-function BC that decomposePar reads.
+# scotch is a runtime-loaded decomposition-method plugin, so it is named via
+# libs (as on any platform). Turbulence-model libs are NOT needed: decomposePar
+# links genericFvFields and reads unknown BCs (e.g. nutkWallFunction) with the
+# generic patch-field fallback -- the whole-archive EXE_LIBS fix makes that DLL
+# actually load on Windows, matching Linux (no manual model libs required).
 cat > system/decomposeParDict <<'EOF'
 FoamFile { format ascii; class dictionary; location "system"; object decomposeParDict; }
-libs            ("libscotchDecomp.so" "libmomentumTransportModels.so" "libincompressibleMomentumTransportModels.so");
+libs            ("libscotchDecomp.so");
 numberOfSubdomains 2;
 method          scotch;
 EOF
