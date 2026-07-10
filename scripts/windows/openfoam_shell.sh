@@ -12,12 +12,25 @@
 #   OF13_CLONE  the OpenFOAM-13-Windows working copy
 #   OF13_WORK   where $FOAM_RUN and run logs live (default $OF13_ROOT)
 
+# A --rcfile shell is interactive but NOT a login shell, so MSYS2's login-time
+# PATH setup (/etc/profile) has not run and /usr/bin is missing -- external
+# tools like dirname/cygpath/mkdir would fail with "command not found". Restore
+# the MSYS2 environment for the current MSYSTEM (UCRT64) before anything else.
+# ('.' and command are bash builtins, so they work without /usr/bin.)
+if ! command -v dirname >/dev/null 2>&1; then
+    [ -f /etc/profile ] && . /etc/profile
+fi
+
 # Give an interactive shell first (aliases, completion, ...).
 [ -f /etc/bash.bashrc ] && . /etc/bash.bashrc
 [ -f "$HOME/.bashrc" ]  && . "$HOME/.bashrc"
 
-# Where this rcfile (and env.sh) live.
-_OF_SELFDIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" 2>/dev/null && pwd)"
+# Where this rcfile (and env.sh) live. Use bash-native expansion (no external
+# 'dirname') so this still works even if PATH is not set up yet.
+_OF_SELFSRC="${BASH_SOURCE[0]}"
+_OF_SELFDIR="${_OF_SELFSRC%/*}"
+[ "$_OF_SELFDIR" = "$_OF_SELFSRC" ] && _OF_SELFDIR="."
+_OF_SELFDIR="$(cd "$_OF_SELFDIR" 2>/dev/null && pwd || echo "$_OF_SELFDIR")"
 
 # Accept a Windows-style OF13_ROOT (C:\...) passed from the .cmd launcher.
 if [ -n "${OF13_ROOT:-}" ]; then
