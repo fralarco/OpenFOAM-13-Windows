@@ -159,6 +159,21 @@ Foam::decompositionMethod::NewDecomposer
     decomposerConstructorTable::iterator cstrIter =
         decomposerConstructorTablePtr_->find(methodType);
 
+#if defined(_WIN32)
+    // Windows PE/COFF does not pull in a decomposition-method plugin library
+    // (scotch, metis, ...) through the dummy-library link closure that ELF
+    // provides as a DT_NEEDED, so the plugin's run-time-selection registration
+    // never runs and the method is not found. If it is not registered, load
+    // lib<method>Decomp on demand via the standard OpenFOAM plugin mechanism so
+    // that e.g. `method scotch;` works with no per-case `libs (...)` entry,
+    // matching Linux. Silent so a genuine typo still yields the normal error.
+    if (cstrIter == decomposerConstructorTablePtr_->end())
+    {
+        libs.open("lib" + methodType + "Decomp.so", false);
+        cstrIter = decomposerConstructorTablePtr_->find(methodType);
+    }
+#endif
+
     if (cstrIter == decomposerConstructorTablePtr_->end())
     {
         FatalErrorInFunction
@@ -211,6 +226,17 @@ Foam::decompositionMethod::NewDistributor
 
     distributorConstructorTable::iterator cstrIter =
         distributorConstructorTablePtr_->find(methodType);
+
+#if defined(_WIN32)
+    // See NewDecomposer: load the plugin (lib<method>Decomp) on demand on
+    // Windows so a distributor such as `scotch`/`ptscotch` registers without a
+    // per-case `libs (...)`, matching Linux. No-op elsewhere.
+    if (cstrIter == distributorConstructorTablePtr_->end())
+    {
+        libs.open("lib" + methodType + "Decomp.so", false);
+        cstrIter = distributorConstructorTablePtr_->find(methodType);
+    }
+#endif
 
     if (cstrIter == distributorConstructorTablePtr_->end())
     {

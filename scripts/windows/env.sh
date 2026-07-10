@@ -57,7 +57,10 @@ export WM_PROJECT_USER_DIR="${OF13_USER:-/c/OF13User/of-user}"
 export FOAM_USER_LIBBIN="$WM_PROJECT_USER_DIR/platforms/$WM_OPTIONS/lib"
 export FOAM_USER_APPBIN="$WM_PROJECT_USER_DIR/platforms/$WM_OPTIONS/bin"
 export PATH="$WM_DIR:$WM_DIR/platforms/${WM_ARCH}${WM_COMPILER}:$FOAM_APPBIN:$FOAM_USER_APPBIN:$PATH"
-export PATH="$FOAM_LIBBIN:$FOAM_LIBBIN/$FOAM_MPI:$FOAM_USER_LIBBIN:$PATH"
+# $FOAM_LIBBIN first so real plugin DLLs win; $FOAM_LIBBIN/dummy last as the
+# fallback for stub decomposition plugins (e.g. scotch/metis when ThirdParty is
+# not built), mirroring the dummy entry on Linux LD_LIBRARY_PATH.
+export PATH="$FOAM_LIBBIN:$FOAM_LIBBIN/$FOAM_MPI:$FOAM_USER_LIBBIN:$FOAM_LIBBIN/dummy:$PATH"
 export WM_NCOMPPROCS="${WM_NCOMPPROCS:-$(nproc 2>/dev/null || echo 4)}"
 export WM_SCHEDULER=
 echo "OF13 Windows env: WM_PROJECT_DIR=$WM_PROJECT_DIR (prefix $(printf '%s' "$WM_PROJECT_DIR" | wc -c) chars, no subst); WM_OPTIONS=$WM_OPTIONS WM_MPLIB=$WM_MPLIB"

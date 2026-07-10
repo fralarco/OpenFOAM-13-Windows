@@ -85,8 +85,9 @@ Windows port smoke tests (NOT standard OpenFOAM scripts -- validation only):
 Notes:
   - Parallel uses Microsoft MPI (mpiexec). RunFunctions' runParallel calls
     mpiexec on Windows; Linux keeps mpirun.
-  - decomposePar needs no manual turbulence libs (generic patch-field fallback);
-    a decomposition method plugin (e.g. scotch) is still named via 'libs (...)'.
+  - decomposePar uses the standard decomposeParDict, e.g. 'method scotch;' with
+    NO 'libs (...)' entry -- the scotch plugin loads on demand, as on Linux.
+    Wall-function BCs are read via the generic patch-field fallback (no model libs).
   - Type 'of13help' to show this again.
 HLP
     }

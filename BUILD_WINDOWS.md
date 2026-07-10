@@ -89,10 +89,10 @@ wmake libso src/parallel/decompose/scotch     # real scotchDecomp
 bash scripts/windows/run_decompose.sh         # decomposePar -method scotch
 ```
 
-`decomposePar` needs no manual turbulence libraries — wall-function BCs
-(`nutkWallFunction`, …) are read via the generic patch-field fallback, as on
-Linux. Only a decomposition *method* plugin is named, e.g.
-`libs ("libscotchDecomp.so");` for `method scotch`.
+`decomposePar` uses the standard `decomposeParDict` — just `method scotch;`, with
+**no** `libs (...)` entry: the Scotch plugin is loaded on demand, as on Linux.
+No manual turbulence libraries are needed either — wall-function BCs
+(`nutkWallFunction`, …) are read via the generic patch-field fallback.
 
 ## 7. Parallel run (MS-MPI)
 
@@ -105,9 +105,9 @@ bash scripts/windows/run_parallel.sh          # mpiexec -n 2 foamRun -parallel
 
 Notes:
 - `MPI_BUFFER_SIZE` must be set (the scripts set it).
-- A runtime-loaded decomposition *method* is named in `decomposeParDict`, e.g.
-  `libs ("libscotchDecomp.so");` for `method scotch` (`.so` → `.dll` is mapped
-  automatically) — the same as on Linux.
+- `decomposeParDict` uses standard syntax — `method scotch;` with no `libs (...)`
+  entry. The port loads `lib<method>Decomp` on demand (`.so` → `.dll` mapped
+  automatically), so decomposition methods behave the same as on Linux.
 - You do **not** need to add turbulence/model libraries for `decomposePar` to
   read wall-function BCs (`nutkWallFunction`, …); those are handled by the
   generic patch-field fallback, exactly as on Linux.

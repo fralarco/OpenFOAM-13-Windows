@@ -75,10 +75,12 @@ scotch/MS-MPI parallel case you first build Scotch and the MS-MPI Pstream once
 
 ## Notes and limitations
 
-- **decomposePar** needs **no** manual turbulence libraries: wall-function BCs
-  (`nutkWallFunction`, …) are read through the generic patch-field fallback,
-  exactly as on Linux. A decomposition *method* plugin is still named the normal
-  way, e.g. `libs ("libscotchDecomp.so");` for `method scotch`.
+- **decomposePar** uses the **standard** `decomposeParDict` syntax. For Scotch,
+  `method scotch;` is enough — **no** `libs (...)` entry is required (the plugin
+  is loaded on demand, as on Linux), and no manual turbulence libraries are
+  needed either: wall-function BCs (`nutkWallFunction`, …) are read through the
+  generic patch-field fallback. (Case-specific *function objects* may still use
+  the normal OpenFOAM `libs (...)` when a case defines them.)
 - **Parallel** uses **MS-MPI** (`mpiexec`). `RunFunctions`' `runParallel` calls
   `mpiexec` on Windows and keeps `mpirun` on Linux (override via `$FOAM_MPIRUN`).
   Parallel runs need `MPI_BUFFER_SIZE` set (the shell sets it).
