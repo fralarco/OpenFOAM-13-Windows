@@ -222,11 +222,24 @@ endif
 silent:
 	@:
 
+# PE/COFF does not load a linked-but-unreferenced import DLL, so a library whose
+# only role is static-initialiser runtime-selection registration (e.g.
+# genericFvFields/genericLagrangianFields - the generic patch-field fallback used
+# by decomposePar/reconstructPar/foamToVTK to read any BC without the model libs)
+# is dropped from the import table and never registers, unlike ELF which loads
+# every DT_NEEDED library. Pull all EXE_LIBS import libraries with
+# --whole-archive so their static initialisers run; import libs contribute stubs
+# only, so there is no code bloat. Linux/other arches keep the plain list.
+EXE_LIBS_LINK = $(EXE_LIBS)
+ifeq ($(WM_ARCH),mingw_w64)
+EXE_LIBS_LINK = -Wl,--whole-archive $(EXE_LIBS) -Wl,--no-whole-archive
+endif
+
 $(EXE): $(OBJECTS)
 	@$(WM_SCRIPTS)/makeTargetDir $(EXE)
 	$(call QUIET_MESSAGE,ld,$(EXE))
 	$E $(LINKEXE) $(OBJECTS) -L$(LIB_PLATFORMS) \
-	    $(EXE_LIBS) $(PROJECT_LIBS) $(SYS_LIBS) \
+	    $(EXE_LIBS_LINK) $(PROJECT_LIBS) $(SYS_LIBS) \
 	    $(LINK_LIBS) $(GLIBS) -o $(EXE)
 
 .PHONY: exe
