@@ -40,17 +40,31 @@ CLEAN=1 bash /c/OF13/OpenFOAM-13-Windows/scripts/windows/run_global_build.sh
 
 See [BUILD_WINDOWS.md](BUILD_WINDOWS.md) for details and options.
 
-## OpenFOAM 13 Windows Shell
+## OpenFOAM 13 Windows Terminal
 
-Double-click **`scripts/windows/OpenFOAM-13-Windows-Shell.cmd`** to open an MSYS2
-UCRT64 terminal with the OpenFOAM environment ready (banner, prompt, `$FOAM_RUN`).
-Change the install location by setting `OF13_ROOT` (default `C:\OF13WinNormal`)
-before launching, e.g. `set OF13_ROOT=C:\OF13` then run the launcher. Verify:
+Double-click **`scripts/windows/OpenFOAM-13-Windows-Terminal.cmd`** — the
+preferred launcher. It opens the OpenFOAM environment in **Windows Terminal**
+(`wt.exe`) when available, and falls back to the MinTTY launcher
+**`scripts/windows/OpenFOAM-13-Windows-Shell.cmd`** otherwise. Either way it
+opens an MSYS2 **UCRT64** shell that loads OpenFOAM, sets the MS-MPI variables,
+starts in `$FOAM_RUN`, and shows a compact banner with a modern prompt.
+
+Override the install locations before launching:
+
+```bat
+set OF13_ROOT=C:\MyOpenFOAM
+set MSYS2_ROOT=C:\msys64
+```
+
+(`OF13_ROOT` defaults to `C:\OF13WinNormal`, `MSYS2_ROOT` to `C:\msys64`; no admin
+required.) Inside the shell, `of13help` prints the workflow and `of13status`
+prints the environment. Verify:
 
 ```sh
 echo $WM_PROJECT_DIR
 which foamRun
 foamDictionary -help
+of13status
 ```
 
 ## Running a case (standard OpenFOAM workflow)

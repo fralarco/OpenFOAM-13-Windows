@@ -23,15 +23,18 @@ not required to be `C:\OF13WinNormal`:
 `env.sh` is sourced by every script and exports the full `WM_*`/`FOAM_*`
 environment from the above.
 
-## The OpenFOAM 13 Windows Shell (day-to-day use)
+## The OpenFOAM 13 Windows Terminal (day-to-day use)
 
 For interactive use, don't source scripts by hand — launch the ready-made
-environment. Double-click **`OpenFOAM-13-Windows-Shell.cmd`** (or run
-**`OpenFOAM-13-Windows-Shell.ps1`**). It opens an MSYS2 **UCRT64** terminal with
-the OpenFOAM environment loaded: a banner, the `OF13-Windows` prompt, and
-`$FOAM_RUN` created and entered. Configure `MSYS2_ROOT` (default `C:\msys64`) and
-`OF13_ROOT` (default `C:\OF13WinNormal`) via the environment before launching.
-Inside, run a case the standard OpenFOAM way:
+environment. Double-click **`OpenFOAM-13-Windows-Terminal.cmd`** (preferred): it
+opens the environment in **Windows Terminal** (`wt.exe`) when available and
+falls back to the MinTTY launcher **`OpenFOAM-13-Windows-Shell.cmd`** otherwise
+(`OpenFOAM-13-Windows-Shell.ps1` is the PowerShell equivalent). Each opens an
+MSYS2 **UCRT64** shell that loads OpenFOAM, sets the MS-MPI variables, starts in
+`$FOAM_RUN`, and shows a compact banner and a modern prompt. Override
+`MSYS2_ROOT` (default `C:\msys64`) and `OF13_ROOT` (default `C:\OF13WinNormal`)
+before launching. Inside, `of13help` prints the workflow and `of13status` the
+environment; run a case the standard OpenFOAM way:
 
 ```sh
 cd $FOAM_RUN
@@ -43,9 +46,10 @@ cd pitzDaily && ./Allrun
 
 | File | What it does |
 | --- | --- |
-| `OpenFOAM-13-Windows-Shell.cmd` | double-click launcher: opens a UCRT64 shell with the OpenFOAM environment ready |
+| `OpenFOAM-13-Windows-Terminal.cmd` | **preferred** launcher: Windows Terminal (`wt.exe`), MinTTY fallback |
+| `OpenFOAM-13-Windows-Shell.cmd` | MinTTY fallback launcher (UCRT64 shell, OpenFOAM environment ready) |
 | `OpenFOAM-13-Windows-Shell.ps1` | PowerShell equivalent of the `.cmd` launcher |
-| `openfoam_shell.sh` | rcfile the launchers source (loads `env.sh`, banner, prompt, `$FOAM_RUN`) |
+| `openfoam_shell.sh` | rcfile the launchers source (loads `env.sh`, banner, prompt, `of13help`/`of13status`) |
 | `env.sh` | the shared build/run environment (source this) |
 | `run_global_build.sh` | full src+apps build (`CLEAN=1` purges first) + inventory |
 | `global_build_inventory.py` | per-target artifact inventory → JSON |

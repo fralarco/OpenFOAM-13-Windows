@@ -1,9 +1,10 @@
 #!/bin/bash
 # OpenFOAM-13 native Windows interactive shell setup (MSYS2 UCRT64 / MinGW-w64).
 #
-# Sourced as the bash --rcfile by OpenFOAM-13-Windows-Shell.cmd (or source it
-# yourself). It loads the OpenFOAM environment, sets a visible prompt, prepares
-# $FOAM_RUN, and prints how to use the standard OpenFOAM tutorial workflow.
+# Sourced as the bash --rcfile by the Windows launchers
+# (OpenFOAM-13-Windows-Terminal.cmd / OpenFOAM-13-Windows-Shell.cmd), or source
+# it yourself. It loads the OpenFOAM environment, sets a compact modern banner
+# and prompt, prepares $FOAM_RUN, and defines the of13help / of13status helpers.
 #
 # Independent, clean-room implementation.
 #
@@ -49,8 +50,10 @@ elif [ ! -d "$_OF_CLONE/etc" ]; then
     echo "OpenFOAM shell: clone not found at $_OF_CLONE"
     echo "  Set OF13_ROOT (currently ${OF13_ROOT:-unset}) to your OpenFOAM-13-Windows base and relaunch."
 else
-    # env.sh runs with 'set -e'; keep the interactive shell alive afterwards.
-    . "$_OF_SELFDIR/env.sh"
+    # env.sh runs with 'set -e' and prints its own status line; keep the
+    # interactive shell alive afterwards and silence its stdout so startup
+    # shows only the compact banner below (exports still take effect).
+    . "$_OF_SELFDIR/env.sh" >/dev/null
     set +e +u +o pipefail 2>/dev/null
 
     export MPI_BUFFER_SIZE="${MPI_BUFFER_SIZE:-20000000}"
@@ -58,44 +61,109 @@ else
     mkdir -p "$FOAM_RUN" 2>/dev/null
     cd "$FOAM_RUN" 2>/dev/null || cd "$OF13_ROOT" 2>/dev/null
 
-    # Visible prompt marking the OpenFOAM Windows environment.
-    PS1='\[\e[1;32m\]OF13-Windows\[\e[0m\]:\[\e[1;34m\]\w\[\e[0m\]\$ '
+    # Put MS-MPI's mpiexec on PATH if present (installer default location or
+    # $MSMPI_BIN) so parallel runs work out of the box.
+    _ofMPIbin="${MSMPI_BIN:-/c/Program Files/Microsoft MPI/Bin}"
+    if [ -x "$_ofMPIbin/mpiexec.exe" ]; then
+        case ":$PATH:" in
+            *":$_ofMPIbin:"*) ;;
+            *) export PATH="$_ofMPIbin:$PATH";;
+        esac
+    fi
+    unset _ofMPIbin
 
+    # --- ANSI colours (only when writing to a terminal) -------------------
+    if [ -t 1 ]; then
+        _ofC=$'\e[1;36m'   # bold cyan  (title / accent)
+        _ofB=$'\e[1;34m'   # bold blue  (paths)
+        _ofD=$'\e[0;90m'   # dim grey   (labels/help)
+        _ofR=$'\e[0m'      # reset
+    else
+        _ofC='' ; _ofB='' ; _ofD='' ; _ofR=''
+    fi
+
+    # --- Modern two-line prompt (dark- and light-terminal readable) -------
+    PS1="\[${_ofC}\]OF13-Windows\[${_ofR}\] \[${_ofB}\]\w\[${_ofR}\]\n\$ "
+
+    # --- help ------------------------------------------------------------
     of13help() {
-        cat <<'HLP'
-OpenFOAM-13 (native Windows, MinGW-w64 / MS-MPI)
+        cat <<HLP
+${_ofC}OpenFOAM 13 Windows -- help${_ofR}
 
-Typical OpenFOAM usage (standard workflow):
-  cd $FOAM_RUN
-  cp -r $FOAM_TUTORIALS/incompressibleFluid/pitzDaily .
+${_ofD}Standard OpenFOAM workflow (recommended):${_ofR}
+  cd \$FOAM_RUN
+  cp -r \$FOAM_TUTORIALS/incompressibleFluid/pitzDaily .
   cd pitzDaily
-  ./Allrun
+  ./Allrun                 # Allclean to reset the case
 
-Manual usage:
-  blockMesh
+${_ofD}Manual commands:${_ofR}
+  blockMesh                # or: blockMesh -dict <path>
   checkMesh
-  decomposePar
+  decomposePar             # standard decomposeParDict (see below)
   mpiexec -n 2 foamRun -solver incompressibleFluid -parallel
   reconstructPar
 
-Windows port smoke tests (NOT standard OpenFOAM scripts -- validation only):
-  bash $WM_PROJECT_DIR/scripts/windows/run_serial.sh
-  bash $WM_PROJECT_DIR/scripts/windows/run_parallel.sh
+${_ofD}Decomposition (scotch):${_ofR}
+  system/decomposeParDict needs only the standard entries, e.g.:
+      numberOfSubdomains 2;
+      method          scotch;
+  No 'libs (...)' entry is required -- the scotch plugin loads on demand,
+  exactly as on Linux. Wall-function BCs (nutkWallFunction, ...) are read
+  through the generic patch-field fallback, so no model libs are needed either.
+  (Case function objects may still use the normal OpenFOAM 'libs (...)'.)
 
-Notes:
-  - Parallel uses Microsoft MPI (mpiexec). RunFunctions' runParallel calls
-    mpiexec on Windows; Linux keeps mpirun.
-  - decomposePar uses the standard decomposeParDict, e.g. 'method scotch;' with
-    NO 'libs (...)' entry -- the scotch plugin loads on demand, as on Linux.
-    Wall-function BCs are read via the generic patch-field fallback (no model libs).
-  - Type 'of13help' to show this again.
+${_ofD}Parallel (MS-MPI):${_ofR}
+  Uses Microsoft MPI: 'mpiexec -n N'. RunFunctions' runParallel calls mpiexec
+  on Windows (mpirun on Linux; override with \$FOAM_MPIRUN). MPI_BUFFER_SIZE is
+  set for you.
+
+${_ofD}Windows-port validation scripts (NOT the standard workflow):${_ofR}
+  bash \$WM_PROJECT_DIR/scripts/windows/run_serial.sh     # serial smoke test
+  bash \$WM_PROJECT_DIR/scripts/windows/run_parallel.sh   # parallel smoke test
+  These only exercise the toolchain end-to-end; use ./Allrun for real cases.
+
+Type 'of13status' for environment details.
 HLP
     }
 
-    echo "Setting environment for OpenFOAM 13 mingw-w64 Double Precision (of13-win), using MS-MPI..."
-    echo "Environment is now ready."
-    echo
-    of13help
+    # --- status ----------------------------------------------------------
+    of13status() {
+        local _mpiexec _foamrun _pathsum
+        _mpiexec="$(command -v mpiexec 2>/dev/null || echo '(not found)')"
+        _foamrun="$(command -v foamRun 2>/dev/null || echo '(not found)')"
+        _pathsum="$(printf '%s' "$PATH" | tr ':' '\n' | grep -iE 'platforms|Microsoft MPI|ucrt64/bin' | head -6 | tr '\n' ' ')"
+        printf '%sOpenFOAM 13 Windows -- environment%s\n\n' "$_ofC" "$_ofR"
+        printf '  %-18s %s\n' "WM_PROJECT_DIR"    "${WM_PROJECT_DIR:-(unset)}"
+        printf '  %-18s %s\n' "WM_THIRD_PARTY_DIR" "${WM_THIRD_PARTY_DIR:-(unset)}"
+        printf '  %-18s %s\n' "FOAM_RUN"          "${FOAM_RUN:-(unset)}"
+        printf '  %-18s %s\n' "FOAM_APPBIN"       "${FOAM_APPBIN:-(unset)}"
+        printf '  %-18s %s\n' "FOAM_LIBBIN"       "${FOAM_LIBBIN:-(unset)}"
+        printf '  %-18s %s\n' "WM_OPTIONS"        "${WM_OPTIONS:-(unset)}"
+        printf '  %-18s %s\n' "WM_MPLIB"          "${WM_MPLIB:-(unset)}"
+        printf '  %-18s %s\n' "MSYSTEM"           "${MSYSTEM:-(unset)}"
+        printf '  %-18s %s\n' "MPI_BUFFER_SIZE"   "${MPI_BUFFER_SIZE:-(unset)}"
+        printf '  %-18s %s\n' "which foamRun"     "$_foamrun"
+        printf '  %-18s %s\n' "which mpiexec"     "$_mpiexec"
+        printf '  %-18s %s\n' "PATH (OF/MPI)"     "${_pathsum:-(none)}"
+    }
+
+    # --- compact startup banner ------------------------------------------
+    if command -v mpiexec >/dev/null 2>&1; then _ofMPI="MS-MPI via mpiexec"
+    else _ofMPI="serial (mpiexec not on PATH)"; fi
+    printf '%sOpenFOAM 13 Windows%s\n' "$_ofC" "$_ofR"
+    printf '%sNative MinGW-w64 / MS-MPI environment ready%s\n\n' "$_ofD" "$_ofR"
+    printf '  %sProject%s : %s\n' "$_ofD" "$_ofR" "${WM_PROJECT_DIR}"
+    printf '  %sRun dir%s : %s\n' "$_ofD" "$_ofR" "${FOAM_RUN}"
+    printf '  %sMPI    %s : %s\n' "$_ofD" "$_ofR" "${_ofMPI}"
+    printf '  %sOptions%s : %s\n\n' "$_ofD" "$_ofR" "${WM_OPTIONS}"
+    printf '%sTypical workflow:%s\n' "$_ofD" "$_ofR"
+    printf '  cd $FOAM_RUN\n'
+    printf '  cp -r $FOAM_TUTORIALS/incompressibleFluid/pitzDaily .\n'
+    printf '  cd pitzDaily\n'
+    printf '  ./Allrun\n\n'
+    printf "Type '%sof13help%s' for help.  Type '%sof13status%s' for environment details.\n" \
+        "$_ofC" "$_ofR" "$_ofC" "$_ofR"
+    unset _ofMPI
 fi
 
-unset _OF_SELFDIR _OF_ROOT _OF_CLONE
+unset _OF_SELFSRC _OF_SELFDIR _OF_ROOT _OF_CLONE

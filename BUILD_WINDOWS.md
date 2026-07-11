@@ -44,20 +44,35 @@ resolution), builds `src` + `applications` in dependency order, and writes an
 artifact inventory. Expect: solvers 5/5, modules 45/45, legacy 15/15, utilities
 133/137, src libraries 104/114.
 
-## 4. The OpenFOAM 13 Windows Shell
+## 4. The OpenFOAM 13 Windows Terminal
 
 For day-to-day use, launch the ready-made environment instead of sourcing
-scripts by hand. Double-click **`scripts/windows/OpenFOAM-13-Windows-Shell.cmd`**
-(or run `scripts/windows/OpenFOAM-13-Windows-Shell.ps1`). It opens an MSYS2
-**UCRT64** terminal with the OpenFOAM environment loaded (banner, `OF13-Windows`
-prompt, `$FOAM_RUN` created). Configure `MSYS2_ROOT` (default `C:\msys64`) and
-`OF13_ROOT` (default `C:\OF13WinNormal`) via the environment before launching.
-Verify inside the shell:
+scripts by hand.
+
+- **Preferred:** double-click **`scripts/windows/OpenFOAM-13-Windows-Terminal.cmd`**.
+  It opens the environment in **Windows Terminal** (`wt.exe`) when available and
+  falls back to the MinTTY launcher otherwise.
+- **Fallback:** **`scripts/windows/OpenFOAM-13-Windows-Shell.cmd`** (MinTTY), or
+  `scripts/windows/OpenFOAM-13-Windows-Shell.ps1` (PowerShell).
+
+Both open an MSYS2 **UCRT64** shell that loads OpenFOAM, sets the MS-MPI
+variables, starts in `$FOAM_RUN`, and shows a compact banner and a modern
+prompt. Override the install locations before launching:
+
+```bat
+set OF13_ROOT=C:\MyOpenFOAM
+set MSYS2_ROOT=C:\msys64
+```
+
+(`OF13_ROOT` defaults to `C:\OF13WinNormal`, `MSYS2_ROOT` to `C:\msys64`; no admin
+required.) Inside the shell, `of13help` prints the workflow and `of13status`
+prints the environment. Verify:
 
 ```sh
 echo $WM_PROJECT_DIR
 which foamRun
 foamDictionary -help
+of13status
 ```
 
 ## 5. Running a case (standard OpenFOAM workflow)

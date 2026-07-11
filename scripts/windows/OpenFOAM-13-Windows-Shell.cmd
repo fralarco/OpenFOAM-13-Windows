@@ -1,9 +1,11 @@
 @echo off
 setlocal EnableExtensions
 rem ==========================================================================
-rem  OpenFOAM-13 native Windows shell launcher (MSYS2 UCRT64 / MinGW-w64).
-rem  Double-click to open an MSYS2 UCRT64 terminal with the OpenFOAM-13
-rem  environment ready. Independent, clean-room implementation.
+rem  OpenFOAM-13 native Windows shell launcher -- MinTTY fallback
+rem  (MSYS2 UCRT64 / MinGW-w64). For the modern experience use
+rem  OpenFOAM-13-Windows-Terminal.cmd (Windows Terminal); this launcher is the
+rem  fallback and sources the same openfoam_shell.sh -- no duplicated env logic.
+rem  Independent, clean-room implementation.
 rem
 rem  Configurable (examples -- override via environment or edit here):
 rem    MSYS2_ROOT   MSYS2 install root      (default C:\msys64)
