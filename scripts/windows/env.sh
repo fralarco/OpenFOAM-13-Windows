@@ -92,7 +92,10 @@ export FOAM_MPI
 export WM_PROJECT_USER_DIR="${OF13_USER:-/c/OF13User/of-user}"
 export FOAM_USER_LIBBIN="$WM_PROJECT_USER_DIR/platforms/$WM_OPTIONS/lib"
 export FOAM_USER_APPBIN="$WM_PROJECT_USER_DIR/platforms/$WM_OPTIONS/bin"
-export PATH="$WM_DIR:$WM_DIR/platforms/${WM_ARCH}${WM_COMPILER}:$FOAM_APPBIN:$FOAM_USER_APPBIN:$PATH"
+# $WM_PROJECT_DIR/bin holds the OpenFOAM driver scripts (foamRunTutorials,
+# foamCleanTutorials, foamLog, ...) that Allrun/Alltest call -- on Linux the etc
+# bashrc puts it on PATH; do the same here.
+export PATH="$WM_PROJECT_DIR/bin:$WM_DIR:$WM_DIR/platforms/${WM_ARCH}${WM_COMPILER}:$FOAM_APPBIN:$FOAM_USER_APPBIN:$PATH"
 # $FOAM_LIBBIN first so real plugin DLLs win; $FOAM_LIBBIN/dummy last as the
 # fallback for stub decomposition plugins (e.g. scotch/metis when ThirdParty is
 # not built), mirroring the dummy entry on Linux LD_LIBRARY_PATH.
