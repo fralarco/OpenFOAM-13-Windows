@@ -235,6 +235,38 @@ ifeq ($(WM_ARCH),mingw_w64)
 EXE_LIBS_LINK = -Wl,--whole-archive $(EXE_LIBS) -Wl,--no-whole-archive
 endif
 
+# Solver/application modules (applications/modules/*) are dlopen-ed at run time
+# by the run-time solvers (foamRun, ...). Like an ELF binary pulling in every
+# DT_NEEDED library, a module must import ALL of its declared LIB_LIBS so the
+# registration-only model / boundary-condition / constraint libraries it lists
+# (fvModels, fvConstraints, momentum & thermophysical transport, reactions, ...)
+# actually load and register their run-time-selected types; PE/COFF otherwise
+# drops any import with no directly referenced symbol, giving "Unknown <type>"
+# at run time (e.g. JohnsonJacksonParticleSlip, limitPressure).
+#
+# Scope + safety: applied ONLY to libraries built under applications/modules/.
+# No such module links a dummy/fallback import library (verified by
+# tools/windows_solver_module_import_audit.py: anyModuleLinksDummy == false), so
+# unlike libparallel's dummy scotchDecomp there is no dummy/real symbol mismatch
+# (STATUS_ENTRYPOINT_NOT_FOUND / 0xC0000139). Import libraries contribute stubs
+# only, so there is no code bloat. Linux/other arches, and every non-module
+# library, keep the plain list unchanged.
+LIB_LIBS_LINK = $(LIB_LIBS)
+ifeq ($(WM_ARCH),mingw_w64)
+ifneq (,$(findstring /applications/modules/,$(subst \,/,$(abspath $(CURDIR)))))
+# Force-import the module's registration-only libraries. The large base
+# libraries are kept OUT of --whole-archive (they are already directly
+# referenced, hence imported): whole-archiving their thousands of exports only
+# bloats the module import table and slows the link with no benefit.
+WIN_NO_WHOLE_ARCHIVE_LIBS ?= OpenFOAM finiteVolume meshTools sampling Pstream
+LIB_LIBS_LINK = $(filter-out -l%,$(LIB_LIBS)) \
+    $(addprefix -l,$(filter $(WIN_NO_WHOLE_ARCHIVE_LIBS),$(patsubst -l%,%,$(filter -l%,$(LIB_LIBS))))) \
+    -Wl,--whole-archive \
+    $(addprefix -l,$(filter-out $(WIN_NO_WHOLE_ARCHIVE_LIBS),$(patsubst -l%,%,$(filter -l%,$(LIB_LIBS))))) \
+    -Wl,--no-whole-archive
+endif
+endif
+
 $(EXE): $(OBJECTS)
 	@$(WM_SCRIPTS)/makeTargetDir $(EXE)
 	$(call QUIET_MESSAGE,ld,$(EXE))
@@ -290,7 +322,7 @@ ifeq ($(WM_ARCH),mingw_w64)
 	$(file >$(LIB).objs)$(foreach O,$(OBJECTS),$(file >>$(LIB).objs,$O))
 	$E tac $(LIB).objs | cygpath -m -f - > $(LIB).rsp
 	$E $(LINKLIBSO) @$(LIB).rsp -L$(LIB_PLATFORMS) \
-	    $(LIB_LIBS) $(GLIB_LIBS) $(MINGW_PROJECT_LIBS) -o $(LIB).$(SO)
+	    $(LIB_LIBS_LINK) $(GLIB_LIBS) $(MINGW_PROJECT_LIBS) -o $(LIB).$(SO)
 else
 	$E $(LINKLIBSO) $(OBJECTS) -L$(LIB_PLATFORMS) \
 	    $(LIB_LIBS) $(GLIB_LIBS) -o $(LIB).$(SO)

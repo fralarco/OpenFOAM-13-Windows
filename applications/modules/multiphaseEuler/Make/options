@@ -15,14 +15,7 @@ EXE_INC = \
 
 LIB_LIBS = \
     -lfluidSolver \
-    -lpopulationBalance
-
-# Registration-only libraries: their contribution is the static-initialiser
-# run-time-selection registration of patch fields / models / constraints (e.g.
-# JohnsonJacksonParticleSlip, the kinetic-theory & thermophysical-transport &
-# reaction models, fvModels, the limitPressure fvConstraint), not a directly
-# referenced symbol.
-_multiphaseEulerRegLibs = \
+    -lpopulationBalance \
     -lmultiphaseEulerMomentumTransportModels \
     -lmultiphaseEulerThermophysicalTransportModels \
     -lmultiphaseEulerReactions \
@@ -30,17 +23,13 @@ _multiphaseEulerRegLibs = \
     -lfvConstraints
 
 ifeq ($(WM_ARCH),mingw_w64)
-    # PE/COFF drops an import DLL when no symbol is referenced directly, so the
-    # registration-only libraries above never load and the solver reports
-    # "Unknown ... type" (patch field JohnsonJacksonParticleSlip, constraint
-    # limitPressure, ...). Force them into the import table with --whole-archive
-    # so their registrations run when the module is loaded. They are real
-    # libraries (no dummy variant), so there is no dummy/real symbol mismatch.
-    # Also close the PE link for the directly referenced finiteVolume /
-    # phaseSystem / fluidThermophysicalModels symbols (ELF resolves these at
-    # load time).
-    LIB_LIBS += -Wl,--whole-archive $(_multiphaseEulerRegLibs) -Wl,--no-whole-archive \
-        -lfiniteVolume -lphaseSystem -lfluidThermophysicalModels
-else
-    LIB_LIBS += $(_multiphaseEulerRegLibs)
+    # PE/COFF requires explicit link closure for directly
+    # referenced symbols; ELF resolves them at load time
+    LIB_LIBS += -lfiniteVolume -lphaseSystem
+endif
+
+ifeq ($(WM_ARCH),mingw_w64)
+    # PE/COFF requires explicit link closure for directly
+    # referenced symbols; ELF resolves them at load time
+    LIB_LIBS += -lfluidThermophysicalModels
 endif
