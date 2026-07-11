@@ -45,8 +45,15 @@ rem --- forward-slash path so bash --rcfile accepts it ---
 set "OF_RC=%OF_SCRIPT_DIR:\=/%openfoam_shell.sh"
 
 rem --- launch: prefer MinTTY, otherwise a plain bash console ---
+rem  Visual options match the "OpenFOAM Dark" scheme (dark blue, light text,
+rem  cyan cursor). "Cascadia Mono" is used when installed; MinTTY silently
+rem  falls back to its default font if it is not -- no font files are bundled.
 if exist "%MSYS2_ROOT%\usr\bin\mintty.exe" (
-  start "" "%MSYS2_ROOT%\usr\bin\mintty.exe" -t "OpenFOAM-13-Windows" /usr/bin/bash --rcfile "%OF_RC%" -i
+  start "" "%MSYS2_ROOT%\usr\bin\mintty.exe" -t "OpenFOAM 13 Windows" ^
+    -o Font="Cascadia Mono" -o FontHeight=11 ^
+    -o BackgroundColour=7,17,31 -o ForegroundColour=214,222,235 ^
+    -o CursorColour=0,229,255 -o CursorType=block ^
+    /usr/bin/bash --rcfile "%OF_RC%" -i
 ) else (
   "%MSYS2_ROOT%\usr\bin\bash.exe" --rcfile "%OF_RC%" -i
 )

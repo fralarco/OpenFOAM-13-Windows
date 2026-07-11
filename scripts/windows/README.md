@@ -42,6 +42,13 @@ cp -r $FOAM_TUTORIALS/incompressibleFluid/pitzDaily .
 cd pitzDaily && ./Allrun
 ```
 
+**Terminal appearance (optional).** For the nicest look under Windows Terminal,
+copy the `scheme` and `profile` blocks from `windows-terminal-profile.json` into
+your Windows Terminal `settings.json`. The MinTTY fallback already applies
+matching dark colours. The theme is optional (OpenFOAM runs the same without it)
+and bundles **no font files** — Cascadia Mono ships with Windows Terminal and the
+default font is used if it is missing.
+
 ## Files
 
 | File | What it does |
@@ -50,6 +57,7 @@ cd pitzDaily && ./Allrun
 | `OpenFOAM-13-Windows-Shell.cmd` | MinTTY fallback launcher (UCRT64 shell, OpenFOAM environment ready) |
 | `OpenFOAM-13-Windows-Shell.ps1` | PowerShell equivalent of the `.cmd` launcher |
 | `openfoam_shell.sh` | rcfile the launchers source (loads `env.sh`, banner, prompt, `of13help`/`of13status`) |
+| `windows-terminal-profile.json` | optional Windows Terminal profile + `OpenFOAM Dark` colour scheme |
 | `env.sh` | the shared build/run environment (source this) |
 | `run_global_build.sh` | full src+apps build (`CLEAN=1` purges first) + inventory |
 | `global_build_inventory.py` | per-target artifact inventory → JSON |

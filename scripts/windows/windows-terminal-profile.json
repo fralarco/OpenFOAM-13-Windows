@@ -1,0 +1,53 @@
+{
+  // OpenFOAM 13 Windows -- OPTIONAL Windows Terminal profile + colour scheme.
+  //
+  // This file is not required to run OpenFOAM; it only makes the terminal look
+  // nicer. To use it, open Windows Terminal -> Settings -> "Open JSON file" and:
+  //   1. copy the "scheme" object below into the top-level  "schemes": [ ... ]  array;
+  //   2. copy the "profile" object below into  "profiles": { "list": [ ... ] }.
+  // Then pick "OpenFOAM 13 Windows" from the new-tab dropdown.
+  //
+  // Adjust "commandline" / "startingDirectory" if MSYS2 or OpenFOAM live
+  // elsewhere (defaults shown are the documented examples, not personal paths).
+  // No administrator rights and no external font files are needed: Cascadia
+  // Mono ships with Windows Terminal, and the terminal falls back to its default
+  // font if it is missing. Environment loading stays in openfoam_shell.sh; this
+  // file only sets appearance.
+
+  "profile": {
+    "name": "OpenFOAM 13 Windows",
+    "tabTitle": "OF13 Windows",
+    "commandline": "C:\\msys64\\usr\\bin\\env.exe MSYSTEM=UCRT64 CHERE_INVOKING=1 /usr/bin/bash --rcfile C:/OF13WinNormal/OpenFOAM-13-Windows/scripts/windows/openfoam_shell.sh -i",
+    "startingDirectory": "C:\\OF13WinNormal\\run",
+    "colorScheme": "OpenFOAM Dark",
+    "font": { "face": "Cascadia Mono", "size": 11 },
+    "cursorShape": "bar",
+    "antialiasingMode": "grayscale",
+    "padding": "10",
+    "hidden": false
+  },
+
+  "scheme": {
+    "name": "OpenFOAM Dark",
+    "background": "#07111F",
+    "foreground": "#D6DEEB",
+    "cursorColor": "#00E5FF",
+    "selectionBackground": "#264F78",
+    "black": "#0B1B2B",
+    "red": "#EF5350",
+    "green": "#22C55E",
+    "yellow": "#EAB308",
+    "blue": "#3B82F6",
+    "purple": "#A855F7",
+    "cyan": "#00E5FF",
+    "white": "#D6DEEB",
+    "brightBlack": "#5B6B7B",
+    "brightRed": "#FF6B6B",
+    "brightGreen": "#4ADE80",
+    "brightYellow": "#FBBF24",
+    "brightBlue": "#60A5FA",
+    "brightPurple": "#C084FC",
+    "brightCyan": "#67E8F9",
+    "brightWhite": "#FFFFFF"
+  }
+}

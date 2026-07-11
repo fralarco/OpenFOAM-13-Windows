@@ -150,18 +150,18 @@ HLP
     # --- compact startup banner ------------------------------------------
     if command -v mpiexec >/dev/null 2>&1; then _ofMPI="MS-MPI via mpiexec"
     else _ofMPI="serial (mpiexec not on PATH)"; fi
-    printf '%sOpenFOAM 13 Windows%s\n' "$_ofC" "$_ofR"
+    printf '%sOpenFOAM 13 for Windows%s\n' "$_ofC" "$_ofR"
     printf '%sNative MinGW-w64 / MS-MPI environment ready%s\n\n' "$_ofD" "$_ofR"
-    printf '  %sProject%s : %s\n' "$_ofD" "$_ofR" "${WM_PROJECT_DIR}"
-    printf '  %sRun dir%s : %s\n' "$_ofD" "$_ofR" "${FOAM_RUN}"
-    printf '  %sMPI    %s : %s\n' "$_ofD" "$_ofR" "${_ofMPI}"
-    printf '  %sOptions%s : %s\n\n' "$_ofD" "$_ofR" "${WM_OPTIONS}"
-    printf '%sTypical workflow:%s\n' "$_ofD" "$_ofR"
+    printf '%s%-8s%s%s\n' "$_ofD" "Project" "$_ofR" "${WM_PROJECT_DIR}"
+    printf '%s%-8s%s%s\n' "$_ofD" "Run dir" "$_ofR" "${FOAM_RUN}"
+    printf '%s%-8s%s%s\n' "$_ofD" "MPI" "$_ofR" "${_ofMPI}"
+    printf '%s%-8s%s%s\n\n' "$_ofD" "Options" "$_ofR" "${WM_OPTIONS}"
+    printf '%sTypical workflow%s\n' "$_ofD" "$_ofR"
     printf '  cd $FOAM_RUN\n'
     printf '  cp -r $FOAM_TUTORIALS/incompressibleFluid/pitzDaily .\n'
     printf '  cd pitzDaily\n'
     printf '  ./Allrun\n\n'
-    printf "Type '%sof13help%s' for help.  Type '%sof13status%s' for environment details.\n" \
+    printf "Type '%sof13help%s' for help \xc2\xb7 '%sof13status%s' for diagnostics\n" \
         "$_ofC" "$_ofR" "$_ofC" "$_ofR"
     unset _ofMPI
 fi

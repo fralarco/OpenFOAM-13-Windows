@@ -75,6 +75,14 @@ foamDictionary -help
 of13status
 ```
 
+**Terminal appearance (optional).** Windows Terminal is recommended. An optional
+profile + colour scheme (**OpenFOAM Dark**) is provided at
+`scripts/windows/windows-terminal-profile.json` — copy its `scheme` and `profile`
+blocks into your Windows Terminal `settings.json`. The MinTTY fallback opens with
+matching dark colours automatically. The theme is purely cosmetic (OpenFOAM runs
+the same without it) and **no font files are bundled** — Cascadia Mono ships with
+Windows Terminal and the default font is used if it is missing.
+
 ## 5. Running a case (standard OpenFOAM workflow)
 
 Use the normal OpenFOAM flow — copy a tutorial and run its `Allrun`:
