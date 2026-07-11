@@ -119,12 +119,32 @@ No manual turbulence libraries are needed either — wall-function BCs
 
 ## 7. Parallel run (MS-MPI)
 
+Build the MS-MPI Pstream once (needs the MS-MPI SDK):
+
 ```sh
 export MSMPI_INC='/c/Program Files (x86)/Microsoft SDKs/MPI/Include'
 bash scripts/windows/setup_msmpi.sh           # libmsmpi.a from the SDK
 bash scripts/windows/build_pstream_mpi.sh     # lib/msmpi/libPstream.dll
 bash scripts/windows/run_parallel.sh          # mpiexec -n 2 foamRun -parallel
 ```
+
+Once `platforms/<opt>/lib/msmpi/libPstream.dll` exists and MS-MPI is installed,
+the OpenFOAM shell **auto-selects MS-MPI** (`WM_MPLIB=MSMPI`) so `./Allrun` and
+`mpiexec … foamRun -parallel` load the **real** Pstream, not the dummy one.
+
+**Check the active MPI/Pstream mode** any time:
+
+```sh
+of13status            # shows WM_MPLIB and FOAM_MPI (parallel-ready or serial-only)
+echo $WM_MPLIB        # MSMPI = real Pstream; Dummy = serial only
+which mpiexec
+```
+
+If a parallel run reports *"dummy Pstream … cannot be used in parallel mode"*,
+the dummy Pstream is active (`WM_MPLIB=Dummy`): build the MS-MPI Pstream (above)
+and relaunch the shell, or `export WM_MPLIB=MSMPI FOAM_MPI=msmpi`. With the dummy
+Pstream active, `runParallel` now fails early with that message instead of
+starting ranks that each abort.
 
 Notes:
 - `MPI_BUFFER_SIZE` must be set (the scripts set it).

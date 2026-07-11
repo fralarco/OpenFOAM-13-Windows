@@ -170,6 +170,18 @@ runParallel()
              "remove log file 'log.$LOG_SUFFIX' to re-run"
     else
         echo "Running $APP_RUN in parallel on $PWD using $nProcs processes"
+        # Windows: a parallel run needs the real MS-MPI Pstream. If the dummy
+        # Pstream is active (WM_MPLIB=Dummy) mpiexec would start ranks that each
+        # abort with "dummy Pstream ... cannot be used in parallel mode". Fail
+        # early with a clear message instead. (No effect on Linux/OpenMPI.)
+        if [ "${WM_ARCH:-}" = "mingw_w64" ] && [ "${WM_MPLIB:-Dummy}" = "Dummy" ]
+        then
+            echo "Error: parallel run requested but the dummy Pstream is active (WM_MPLIB=Dummy)." 1>&2
+            echo "  Enable MS-MPI first: build scripts/windows/build_pstream_mpi.sh once, then" 1>&2
+            echo "  relaunch the OpenFOAM shell (it auto-selects MS-MPI), or set" 1>&2
+            echo "  'export WM_MPLIB=MSMPI FOAM_MPI=msmpi' before running." 1>&2
+            return 1
+        fi
         # MPI launcher. OpenMPI (Linux) uses `mpirun -np`; native Windows uses
         # Microsoft MPI, which provides `mpiexec -n` (no mpirun). Preserve Linux
         # behaviour; only switch on the mingw_w64 build. Honour an explicit

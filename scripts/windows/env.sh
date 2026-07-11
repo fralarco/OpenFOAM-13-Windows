@@ -33,7 +33,8 @@ export WM_LABEL_SIZE=32
 export WM_LABEL_OPTION=Int32
 export WM_COMPILE_OPTION=Opt
 export WM_OSTYPE=MSwindows
-export WM_MPLIB="${WM_MPLIB:-Dummy}"
+# WM_MPLIB / FOAM_MPI are selected below, once FOAM_LIBBIN is known (so the real
+# MS-MPI Pstream can be detected). WM_OPTIONS does not depend on WM_MPLIB.
 export WM_CC=gcc; export WM_CXX=g++; export WM_LINK_LANGUAGE=c++
 export WM_OPTIONS="${WM_ARCH}${WM_COMPILER}${WM_PRECISION_OPTION}${WM_LABEL_OPTION}${WM_COMPILE_OPTION}"
 export WM_DIR="$WM_PROJECT_DIR/wmake"
@@ -51,8 +52,43 @@ export FOAM_ETC="$WM_PROJECT_DIR/etc"
 export FOAM_TUTORIALS="$WM_PROJECT_DIR/tutorials"
 export FOAM_UTILITIES="$FOAM_APP/utilities"
 export FOAM_SOLVERS="$FOAM_APP/solvers"
-# FOAM_MPI: dummy for serial; scripts that build the MS-MPI Pstream set msmpi.
-export FOAM_MPI="${FOAM_MPI:-dummy}"
+
+# Put MS-MPI's mpiexec on PATH if present (installer default or $MSMPI_BIN) so
+# parallel launches -- and the MS-MPI auto-detection just below -- work out of
+# the box. Harmless for serial builds.
+_msmpiBin="${MSMPI_BIN:-/c/Program Files/Microsoft MPI/Bin}"
+if [ -x "$_msmpiBin/mpiexec.exe" ]; then
+    case ":$PATH:" in
+        *":$_msmpiBin:"*) ;;
+        *) PATH="$_msmpiBin:$PATH"; export PATH ;;
+    esac
+fi
+unset _msmpiBin
+
+# --- MPI library (Pstream) selection ----------------------------------------
+# Parallel runs need the REAL MS-MPI Pstream ($FOAM_LIBBIN/msmpi/libPstream.dll);
+# the dummy Pstream aborts under mpiexec ("cannot be used in parallel mode"),
+# once per rank. Serial work can use the dummy. When the caller has NOT pinned
+# WM_MPLIB, auto-select MS-MPI for a parallel-ready shell if the real Pstream has
+# been built AND the MS-MPI runtime (mpiexec) is on PATH; otherwise stay serial.
+# Build scripts set WM_MPLIB=Dummy explicitly to keep the serial bootstrap
+# regardless of what is installed. (Set WM_MPLIB=MSMPI to force MS-MPI.)
+if [ -z "${WM_MPLIB:-}" ]; then
+    if [ -f "$FOAM_LIBBIN/msmpi/libPstream.dll" ] && command -v mpiexec >/dev/null 2>&1; then
+        WM_MPLIB=MSMPI
+    else
+        WM_MPLIB=Dummy
+    fi
+fi
+export WM_MPLIB
+# FOAM_MPI selects the Pstream sub-directory; follow WM_MPLIB unless overridden.
+if [ -z "${FOAM_MPI:-}" ]; then
+    case "$WM_MPLIB" in
+        MSMPI*) FOAM_MPI=msmpi ;;
+        *)      FOAM_MPI=dummy ;;
+    esac
+fi
+export FOAM_MPI
 export WM_PROJECT_USER_DIR="${OF13_USER:-/c/OF13User/of-user}"
 export FOAM_USER_LIBBIN="$WM_PROJECT_USER_DIR/platforms/$WM_OPTIONS/lib"
 export FOAM_USER_APPBIN="$WM_PROJECT_USER_DIR/platforms/$WM_OPTIONS/bin"

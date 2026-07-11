@@ -10,6 +10,10 @@
 # artifact inventory (global_build_inventory.py).
 set -uo pipefail
 SELF_DIR="$(cd "$(dirname "$0")" && pwd)"
+# Serial build/bootstrap: pin the dummy Pstream so env.sh does not auto-select
+# MS-MPI (which would need the MS-MPI SDK to recompile Pstream). Override by
+# exporting WM_MPLIB before running this script.
+: "${WM_MPLIB:=Dummy}"; : "${FOAM_MPI:=dummy}"; export WM_MPLIB FOAM_MPI
 source "$SELF_DIR/env.sh"
 set +e
 

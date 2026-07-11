@@ -109,9 +109,17 @@ OpenFOAM tutorials drive parallel steps through `runParallel` in
 uses **Microsoft MPI**, which ships `mpiexec` (there is no `mpirun`). The port
 adapts `RunFunctions` so that `runParallel` uses **`mpiexec -n N`** when
 `WM_ARCH = mingw_w64` (Linux/OpenMPI keeps `mpirun -np`; an explicit
-`$FOAM_MPIRUN` override is honoured). No per-tutorial edits are needed. Set
-`MPI_BUFFER_SIZE` and put `platforms/<opt>/lib/msmpi` + the MS-MPI `Bin` on
-`PATH` (see `run_parallel.sh`).
+`$FOAM_MPIRUN` override is honoured). No per-tutorial edits are needed.
+
+**MPI/Pstream mode.** A parallel run needs the **real** MS-MPI Pstream
+(`platforms/<opt>/lib/msmpi/libPstream.dll`); the dummy Pstream aborts under
+`mpiexec`. `env.sh` **auto-selects MS-MPI** (`WM_MPLIB=MSMPI`, and puts the
+`msmpi` lib dir before `dummy` on `PATH`) when that DLL exists and `mpiexec` is
+available, and puts MS-MPI's `Bin` on `PATH`; otherwise it stays serial
+(`WM_MPLIB=Dummy`). Build scripts pin `WM_MPLIB=Dummy` to keep the serial
+bootstrap. Check the active mode with `of13status` / `echo $WM_MPLIB`. When the
+dummy Pstream is active, `runParallel` fails early with a clear message instead
+of starting ranks that each abort.
 
 Tutorials that use `writeFormat binary` (e.g. motorBike) also rely on the
 binary-mode file-I/O fix in the OpenFOAM tree (`IFstream`/`OFstream` open in

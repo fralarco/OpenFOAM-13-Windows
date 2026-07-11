@@ -61,16 +61,7 @@ else
     mkdir -p "$FOAM_RUN" 2>/dev/null
     cd "$FOAM_RUN" 2>/dev/null || cd "$OF13_ROOT" 2>/dev/null
 
-    # Put MS-MPI's mpiexec on PATH if present (installer default location or
-    # $MSMPI_BIN) so parallel runs work out of the box.
-    _ofMPIbin="${MSMPI_BIN:-/c/Program Files/Microsoft MPI/Bin}"
-    if [ -x "$_ofMPIbin/mpiexec.exe" ]; then
-        case ":$PATH:" in
-            *":$_ofMPIbin:"*) ;;
-            *) export PATH="$_ofMPIbin:$PATH";;
-        esac
-    fi
-    unset _ofMPIbin
+    # (env.sh already put MS-MPI's mpiexec on PATH and auto-selected WM_MPLIB.)
 
     # --- ANSI colours (only when writing to a terminal) -------------------
     if [ -t 1 ]; then
@@ -140,6 +131,8 @@ HLP
         printf '  %-18s %s\n' "FOAM_LIBBIN"       "${FOAM_LIBBIN:-(unset)}"
         printf '  %-18s %s\n' "WM_OPTIONS"        "${WM_OPTIONS:-(unset)}"
         printf '  %-18s %s\n' "WM_MPLIB"          "${WM_MPLIB:-(unset)}"
+        printf '  %-18s %s%s\n' "FOAM_MPI (Pstream)" "${FOAM_MPI:-(unset)}" \
+            "$([ "${WM_MPLIB:-Dummy}" = "Dummy" ] && echo '  -> serial only, parallel unavailable' || echo '  -> parallel-ready')"
         printf '  %-18s %s\n' "MSYSTEM"           "${MSYSTEM:-(unset)}"
         printf '  %-18s %s\n' "MPI_BUFFER_SIZE"   "${MPI_BUFFER_SIZE:-(unset)}"
         printf '  %-18s %s\n' "which foamRun"     "$_foamrun"
@@ -148,10 +141,15 @@ HLP
     }
 
     # --- compact startup banner ------------------------------------------
-    if command -v mpiexec >/dev/null 2>&1; then _ofMPI="MS-MPI via mpiexec"
-    else _ofMPI="serial (mpiexec not on PATH)"; fi
+    # Report the ACTUAL Pstream mode from WM_MPLIB (not just mpiexec presence),
+    # so the banner never claims MS-MPI while the dummy Pstream is active.
+    case "${WM_MPLIB:-Dummy}" in
+        MSMPI*) _ofMPI="MS-MPI (mpiexec)"; _ofReady="Native MinGW-w64 / MS-MPI environment ready";;
+        *)      _ofMPI="serial only - dummy Pstream (parallel unavailable)"
+                _ofReady="Native MinGW-w64 environment ready (serial - dummy Pstream)";;
+    esac
     printf '%sOpenFOAM 13 for Windows%s\n' "$_ofC" "$_ofR"
-    printf '%sNative MinGW-w64 / MS-MPI environment ready%s\n\n' "$_ofD" "$_ofR"
+    printf '%s%s%s\n\n' "$_ofD" "$_ofReady" "$_ofR"
     printf '%s%-8s%s%s\n' "$_ofD" "Project" "$_ofR" "${WM_PROJECT_DIR}"
     printf '%s%-8s%s%s\n' "$_ofD" "Run dir" "$_ofR" "${FOAM_RUN}"
     printf '%s%-8s%s%s\n' "$_ofD" "MPI" "$_ofR" "${_ofMPI}"
@@ -163,7 +161,7 @@ HLP
     printf '  ./Allrun\n\n'
     printf "Type '%sof13help%s' for help \xc2\xb7 '%sof13status%s' for diagnostics\n" \
         "$_ofC" "$_ofR" "$_ofC" "$_ofR"
-    unset _ofMPI
+    unset _ofMPI _ofReady
 fi
 
 unset _OF_SELFSRC _OF_SELFDIR _OF_ROOT _OF_CLONE
