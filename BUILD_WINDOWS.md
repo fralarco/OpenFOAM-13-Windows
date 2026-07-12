@@ -38,14 +38,18 @@ environment variables (see `scripts/windows/README.md`):
 
 ## 3. Full build
 
+Source the environment, then run the standard OpenFOAM build driver from
+`$WM_PROJECT_DIR`:
+
 ```sh
-CLEAN=1 bash scripts/windows/run_global_build.sh
+source scripts/windows/env.sh
+cd "$WM_PROJECT_DIR" && ./Allwmake
 ```
 
-This bootstraps the `libOpenFOAM ↔ libPstream` cycle (PE has no lazy symbol
-resolution), builds `src` + `applications` in dependency order, and writes an
-artifact inventory. Expect: solvers 5/5, modules 45/45, legacy 15/15, utilities
-133/137, src libraries 104/114.
+`Allwmake` builds `src` + `applications` in dependency order. The Windows-guarded
+wmake changes handle the `libOpenFOAM ↔ libPstream` link cycle (PE has no lazy
+symbol resolution), so no special driver is needed. A first build takes a while;
+re-running `./Allwmake` resumes incrementally.
 
 ## 4. The OpenFOAM 13 Windows Terminal
 

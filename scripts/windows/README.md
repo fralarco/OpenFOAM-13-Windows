@@ -59,8 +59,6 @@ default font is used if it is missing.
 | `openfoam_shell.sh` | rcfile the launchers source (loads `env.sh`, banner, prompt, `of13help`/`of13status`) |
 | `windows-terminal-profile.json` | optional Windows Terminal profile + `OpenFOAM Dark` colour scheme |
 | `env.sh` | the shared build/run environment (source this) |
-| `run_global_build.sh` | full src+apps build (`CLEAN=1` purges first) + inventory |
-| `global_build_inventory.py` | per-target artifact inventory → JSON |
 | `run_serial.sh` | **validation smoke test**: blockMesh→checkMesh→foamRun on pitzDaily |
 | `build_scotch.sh` | build ThirdParty Scotch 7.0.8 (static, MinGW) |
 | `scotch/Makefile.inc` | the MinGW Scotch config (copy into scotch src) |
@@ -78,7 +76,7 @@ default font is used if it is missing.
 
 Serial build + run:
 ```sh
-CLEAN=1 bash run_global_build.sh
+( cd "$WM_PROJECT_DIR" && ./Allwmake )   # standard OpenFOAM build
 bash run_serial.sh
 ```
 

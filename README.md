@@ -35,7 +35,8 @@ From an **MSYS2 UCRT64** shell:
 ```sh
 git clone <this-repo> /c/OF13/OpenFOAM-13-Windows
 export OF13_ROOT=/c/OF13
-CLEAN=1 bash /c/OF13/OpenFOAM-13-Windows/scripts/windows/run_global_build.sh
+source /c/OF13/OpenFOAM-13-Windows/scripts/windows/env.sh
+cd "$WM_PROJECT_DIR" && ./Allwmake
 ```
 
 See [BUILD_WINDOWS.md](BUILD_WINDOWS.md) for details and options.
