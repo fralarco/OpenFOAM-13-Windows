@@ -1093,7 +1093,44 @@ bool Foam::ping(const string& hostname, const label timeOut)
 
 int Foam::system(const std::string& command)
 {
-    return ::system(command.c_str());
+    // OpenFOAM's system() commands are POSIX-shell commands: run-time code
+    // compilation (#codeStream / #calc invoke `wmake`), foamJob, the 'system'
+    // function object, etc. Native Windows ::system() runs them through cmd.exe,
+    // which cannot execute the MSYS2/MinGW shell scripts (e.g. wmake). Spawn the
+    // MSYS2 bash directly -- bypassing cmd.exe, so the command is not re-quoted
+    // -- with the command as a single argument, mirroring the POSIX behaviour.
+    // The inherited environment (WM_*, PATH) set by the launcher is kept.
+    //
+    // Use the MSYS2 bash EXPLICITLY: a PATH search for "bash" may resolve to the
+    // Windows/WSL bash (C:\Windows\System32\bash.exe), which is a separate Linux
+    // environment (no /c mounts, no OpenFOAM, no wmake). $FOAM_BASH is exported
+    // by scripts/windows/env.sh; fall back to the default install location, then
+    // to cmd.exe.
+    const char* bash = std::getenv("FOAM_BASH");
+    if (bash == nullptr || bash[0] == '\0')
+    {
+        bash = "C:\\msys64\\usr\\bin\\bash.exe";
+    }
+
+    // Run via ::system() (cmd.exe) invoking the EXPLICIT MSYS2 bash. ::system
+    // waits reliably for completion and propagates the exit code; a native
+    // _spawn of MSYS2 bash returns BEFORE the shell finishes (MSYS2 fork/exec
+    // emulation with a native parent), so a caller such as #codeStream would try
+    // to load a library that wmake has not finished building. Giving the
+    // explicit bash path (not a bare "bash") avoids the Windows/WSL bash that a
+    // PATH search resolves to.
+    //
+    // ::system() runs `cmd /c <string>`. cmd.exe strips the OUTER pair of quotes
+    // from that string, so the whole `"bash" -c "command"` must itself be wrapped
+    // in an extra pair of quotes -- otherwise cmd mis-parses the inner quotes.
+    // OpenFOAM's commands carry no double quotes (they are POSIX commands, e.g.
+    // "cd '...' && wmake -s libso ."), so no further escaping is required.
+    const std::string shellCmd
+    (
+        "\"\"" + std::string(bash) + "\" -c \"" + command + "\"\""
+    );
+
+    return ::system(shellCmd.c_str());
 }
 
 

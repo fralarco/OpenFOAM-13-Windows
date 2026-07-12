@@ -102,4 +102,10 @@ export PATH="$WM_PROJECT_DIR/bin:$WM_DIR:$WM_DIR/platforms/${WM_ARCH}${WM_COMPIL
 export PATH="$FOAM_LIBBIN:$FOAM_LIBBIN/$FOAM_MPI:$FOAM_USER_LIBBIN:$FOAM_LIBBIN/dummy:$PATH"
 export WM_NCOMPPROCS="${WM_NCOMPPROCS:-$(nproc 2>/dev/null || echo 4)}"
 export WM_SCHEDULER=
+# Windows form of THIS MSYS2 bash, for OpenFOAM's run-time Foam::system() calls
+# (#codeStream/#calc -> wmake, foamJob, the 'system' function object). A native
+# process must launch this bash EXPLICITLY: a bare "bash" PATH search from a
+# native/cmd context resolves to C:\Windows\System32\bash.exe (WSL), a separate
+# Linux environment with no /c mounts, no OpenFOAM and no wmake.
+export FOAM_BASH="$(cygpath -w "$(command -v bash)" 2>/dev/null || echo 'C:\msys64\usr\bin\bash.exe')"
 echo "OF13 Windows env: WM_PROJECT_DIR=$WM_PROJECT_DIR (prefix $(printf '%s' "$WM_PROJECT_DIR" | wc -c) chars, no subst); WM_OPTIONS=$WM_OPTIONS WM_MPLIB=$WM_MPLIB"

@@ -519,7 +519,26 @@ bool Foam::dynamicCode::copyOrCreateFiles(const bool verbose) const
 
 bool Foam::dynamicCode::wmakeLibso() const
 {
-    const Foam::string wmakeCmd("wmake -s libso " + this->codePath());
+    Foam::string wmakeCmd("wmake -s libso " + this->codePath());
+
+#if defined(_WIN32)
+    // The command is run in the MSYS2 bash by Foam::system(). A bash spawned by
+    // a native process mishandles an absolute drive-letter directory argument to
+    // wmake (it stays in the case directory), so run wmake from INSIDE the code
+    // directory addressed with a POSIX path ("C:/foo" or "C:\foo" -> "/c/foo").
+    {
+        std::string p(this->codePath());
+        for (char& c : p) { if (c == '\\') c = '/'; }
+        if (p.size() > 2 && p[1] == ':' && p[2] == '/')
+        {
+            char drive = p[0];
+            if (drive >= 'A' && drive <= 'Z') drive = char(drive + ('a' - 'A'));
+            p = "/" + std::string(1, drive) + p.substr(2);
+        }
+        wmakeCmd = "cd '" + p + "' && wmake -s libso .";
+    }
+#endif
+
     Info<< "Invoking " << wmakeCmd << endl;
 
     if (Foam::system(wmakeCmd))
