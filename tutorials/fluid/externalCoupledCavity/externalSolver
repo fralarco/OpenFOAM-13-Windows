@@ -27,6 +27,14 @@ init()
 {
     log "initialisation: creating ${dataFile}.in"
 
+    # foamRun's externalCoupled boundary condition creates ${commsDir} in its
+    # constructor, but here it is launched in the background and, on slower
+    # process startup (e.g. native Windows), may not have created the directory
+    # yet when this dummy solver's init() runs. Create it here too so the two
+    # sides do not race; mkdir -p is idempotent, so this is a no-op on Linux
+    # where foamRun already created it.
+    mkdir -p "${commsDir}"
+
     # Hard-coded for 2 patches of size 2250
     n=2250
     refCold=283
