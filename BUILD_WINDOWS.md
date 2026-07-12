@@ -13,6 +13,9 @@ case-insensitive NTFS directory works — no case-sensitive attribute and no
    pacman -S mingw-w64-ucrt-x86_64-gcc make flex bison git
    ```
    GCC 13+ works (validated on GCC 16.1).
+   A few tutorial `Allrun`/mesh scripts use `bc` for arithmetic; install it with
+   `pacman -S bc`. `gnuplot` (`pacman -S mingw-w64-ucrt-x86_64-gnuplot`) is
+   optional and only used to render post-processing graphs.
 3. (Parallel only) Install **MS-MPI**: `msmpisetup.exe` (runtime) **and**
    `msmpisdk.msi` (SDK), free from Microsoft.
 

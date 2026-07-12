@@ -4,7 +4,7 @@
 > Not affiliated with or endorsed by OpenFOAM Foundation.**
 
 A native Windows build of [OpenFOAM Foundation **OpenFOAM-13**](https://openfoam.org),
-built with **MSYS2 UCRT64 / MinGW-w64**. **No WSL, no Cygwin runtime, no blueCFD.**
+built with **MSYS2 UCRT64 / MinGW-w64**. **No WSL, no Cygwin runtime.**
 
 This is a fork of OpenFOAM-13 with minimal, guarded (`ifeq ($(WM_ARCH),mingw_w64)`)
 changes so the toolbox compiles and runs from a **normal NTFS directory** — no
