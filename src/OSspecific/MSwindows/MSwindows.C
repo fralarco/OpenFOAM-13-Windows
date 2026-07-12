@@ -1150,16 +1150,50 @@ void* Foam::dlOpen(const fileName& lib, const bool check)
         libName = libName.lessExt() + ".dll";
     }
 
-    void* handle =
-        reinterpret_cast<void*>(LoadLibraryA(libName.c_str()));
+    // LoadLibrary of a library that wmake/ld has only just finished writing can
+    // fail intermittently on Windows with ERROR_SHARING_VIOLATION (32) or
+    // ERROR_ACCESS_DENIED (5): the freshly produced DLL is still momentarily
+    // locked by the linker's closing file handle or by an on-access virus
+    // scanner. The file is a valid PE and loads cleanly a few milliseconds
+    // later, so retry a bounded number of times with a short back-off before
+    // giving up. This only helps freshly built run-time code (#codeStream,
+    // #calc, coded BCs / function objects); a genuinely missing or malformed
+    // library fails with a different error (e.g. ERROR_MOD_NOT_FOUND) and is not
+    // retried, so real failures are still reported promptly. POSIX dlopen has no
+    // such race, hence this is confined to the Windows OSspecific layer.
+    HMODULE libHandle = LoadLibraryA(libName.c_str());
 
-    if (!handle && check)
+    if (!libHandle)
     {
-        WarningInFunction
-            << "LoadLibrary error " << unsigned(GetLastError())
-            << " for library " << libName
-            << endl;
+        DWORD err = GetLastError();
+
+        for
+        (
+            int retry = 0;
+            !libHandle
+         && retry < 20
+         && (err == ERROR_SHARING_VIOLATION || err == ERROR_ACCESS_DENIED);
+            ++retry
+        )
+        {
+            ::Sleep(DWORD(50));   // 50 ms per attempt, up to ~1 s total
+            libHandle = LoadLibraryA(libName.c_str());
+            if (!libHandle)
+            {
+                err = GetLastError();
+            }
+        }
+
+        if (!libHandle && check)
+        {
+            WarningInFunction
+                << "LoadLibrary error " << unsigned(err)
+                << " for library " << libName
+                << endl;
+        }
     }
+
+    void* handle = reinterpret_cast<void*>(libHandle);
 
     if (MSwindows::debug)
     {
