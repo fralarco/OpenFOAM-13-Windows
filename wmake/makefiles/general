@@ -318,11 +318,20 @@ ifeq ($(WM_ARCH),mingw_w64)
 # to Windows form (no automatic conversion happens inside @files).
 # The list is reversed (tac): the MinGW CRT runs .ctors in reverse link
 # order while ELF init_array runs forward, so reversing restores the
-# upstream static-initialisation order (word::null before its users)
+# upstream static-initialisation order (word::null before its users).
+# The response-file and output paths are normalised (realpath) before the
+# native linker sees them: run-time compiled libraries (#codeStream, coded
+# thermo, ...) set LIB = $$(PWD)/../platforms/.../lib/lib<longtemplatedname>_<sha1>,
+# so the literal path carries a redundant "<longname>/.." segment. ld.exe
+# applies Windows MAX_PATH to the un-normalised literal, which overflows 260
+# chars even for a short case dir and fails ("cannot find @...rsp: Invalid
+# argument") although the resolved path fits and the file exists. MSYS tools
+# (make $$(file), tac) already normalise, so only the ld invocation needs it.
 	$(file >$(LIB).objs)$(foreach O,$(OBJECTS),$(file >>$(LIB).objs,$O))
 	$E tac $(LIB).objs | cygpath -m -f - > $(LIB).rsp
-	$E $(LINKLIBSO) @$(LIB).rsp -L$(LIB_PLATFORMS) \
-	    $(LIB_LIBS_LINK) $(GLIB_LIBS) $(MINGW_PROJECT_LIBS) -o $(LIB).$(SO)
+	$E $(LINKLIBSO) @"$$(cygpath -m "$$(realpath -m '$(LIB).rsp')")" -L$(LIB_PLATFORMS) \
+	    $(LIB_LIBS_LINK) $(GLIB_LIBS) $(MINGW_PROJECT_LIBS) \
+	    -o "$$(cygpath -m "$$(realpath -m '$(LIB).$(SO)')")"
 else
 	$E $(LINKLIBSO) $(OBJECTS) -L$(LIB_PLATFORMS) \
 	    $(LIB_LIBS) $(GLIB_LIBS) -o $(LIB).$(SO)
