@@ -35,6 +35,7 @@ Description
 #include "IOobjectList.H"
 #include "processorRunTimes.H"
 #include "multiDomainDecomposition.H"
+#include "solver.H"
 #include "fvFieldReconstructor.H"
 #include "pointFieldReconstructor.H"
 #include "lagrangianFieldReconstructor.H"
@@ -317,6 +318,29 @@ int main(int argc, char *argv[])
         Info<< "All times already reconstructed" << nl << nl
             << "End" << nl << endl;
         return 0;
+    }
+
+    // Pre-load region solver libraries so that any solver-specific patch types
+    // in the region meshes (e.g. the film patches from libisothermalFilm) are
+    // registered before the meshes are read. foamRun/foamMultiRun,
+    // extrudeToRegionMesh and decomposePar pre-load solver libraries the same
+    // way; reconstructPar reads the region meshes directly, so it must too.
+    // Required on Windows (PE registers types only from loaded libraries);
+    // an idempotent no-op elsewhere.
+    {
+        const dictionary& regionSolvers =
+            runTimes.completeTime().controlDict().subOrEmptyDict("regionSolvers");
+
+        forAll(regionNames, regioni)
+        {
+            if (regionSolvers.found(regionNames[regioni]))
+            {
+                Foam::solver::load
+                (
+                    regionSolvers.lookup<word>(regionNames[regioni])
+                );
+            }
+        }
     }
 
     // Create meshes

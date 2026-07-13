@@ -123,6 +123,7 @@ becomes
 #include "cyclicPolyPatch.H"
 #include "wedgePolyPatch.H"
 #include "extrudeModel.H"
+#include "solver.H"
 #include "faceSet.H"
 #include "fvMeshTools.H"
 #include "OBJstream.H"
@@ -1058,6 +1059,24 @@ int main(int argc, char *argv[])
 
     // Region to create by extrusion
     const word shellRegionName(dict.lookup("region"));
+
+    // Pre-load the shell region's solver library so that any solver-specific
+    // patch types it registers (e.g. the film patches filmWall/mappedFilmSurface
+    // provided by libisothermalFilm through libfilm) are available before the
+    // region-mesh boundary is constructed. foamRun/foamMultiRun pre-load solver
+    // libraries the same way (Foam::solver::load); extrudeToRegionMesh creates
+    // the region ahead of those solvers, so it must load the target region's
+    // solver too. Required on Windows (PE/COFF only registers types from loaded
+    // libraries); an idempotent no-op elsewhere.
+    {
+        const dictionary& regionSolvers =
+            runTime.controlDict().subOrEmptyDict("regionSolvers");
+
+        if (regionSolvers.found(shellRegionName))
+        {
+            Foam::solver::load(regionSolvers.lookup<word>(shellRegionName));
+        }
+    }
 
     // Should the extruded region overlap the existing region, i.e. "intrude"?
     const Switch intrude(dict.lookupOrDefault("intrude", false));

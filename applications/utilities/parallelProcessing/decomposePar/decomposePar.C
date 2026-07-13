@@ -73,6 +73,7 @@ Usage
 #include "processorRunTimes.H"
 #include "multiDomainDecomposition.H"
 #include "decompositionMethod.H"
+#include "solver.H"
 #include "fvFieldDecomposer.H"
 #include "pointFieldDecomposer.H"
 #include "lagrangianFieldDecomposer.H"
@@ -410,6 +411,29 @@ int main(int argc, char *argv[])
                 << nProcs << " domains" << nl << "instead of " << nDomains
                 << " domains as specified in decomposeParDict" << nl
                 << exit(FatalError);
+        }
+    }
+
+    // Pre-load region solver libraries so that any solver-specific patch types
+    // present in the region meshes (e.g. the film patches filmWall/mappedFilmWall
+    // /mappedFilmSurface from libisothermalFilm) are registered before the region
+    // meshes are read. foamRun/foamMultiRun and extrudeToRegionMesh pre-load
+    // solver libraries the same way; decomposePar reads the region meshes
+    // directly, so it must too. Required on Windows (PE/COFF registers types only
+    // from loaded libraries); an idempotent no-op elsewhere.
+    {
+        const dictionary& regionSolvers =
+            runTimes.completeTime().controlDict().subOrEmptyDict("regionSolvers");
+
+        forAll(regionNames, regioni)
+        {
+            if (regionSolvers.found(regionNames[regioni]))
+            {
+                Foam::solver::load
+                (
+                    regionSolvers.lookup<word>(regionNames[regioni])
+                );
+            }
         }
     }
 
