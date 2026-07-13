@@ -78,5 +78,22 @@ EXE_INC = \
     -I$(LIB_SRC)/finiteVolume/lnInclude
 #};
 
+// Windows (PE/COFF) resolves a DLL's referenced symbols against import
+// libraries at link time; ELF resolves them at dlopen from the loaded process.
+// Give the generated library the link closure matching the EXE_INC above.
+// Guarded to mingw so Linux keeps its empty LIB_LIBS and unchanged behaviour.
+codeLibs
+#{
+ifeq ($(WM_ARCH),mingw_w64)
+LIB_LIBS = \
+    -lfiniteVolume \
+    -lfluidThermophysicalModels \
+    -lthermophysicalProperties \
+    -lspecie \
+    -lphysicalProperties \
+    -lOpenFOAM
+endif
+#};
+
 
 // ************************************************************************* //
