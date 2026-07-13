@@ -78,5 +78,24 @@ EXE_INC = \
     -I$(LIB_SRC)/finiteVolume/lnInclude
 #};
 
+// Windows (PE/COFF) requires every symbol referenced by a DLL to be resolved
+// against an import library at link time, whereas ELF resolves the run-time
+// compiled library's symbols against the already-loaded process image at
+// dlopen. Give the generated library the explicit link closure for the OpenFOAM
+// libraries whose symbols it references (matching the EXE_INC above). Guarded to
+// mingw so Linux keeps its empty LIB_LIBS and unchanged link behaviour.
+codeLibs
+#{
+ifeq ($(WM_ARCH),mingw_w64)
+LIB_LIBS = \
+    -lfiniteVolume \
+    -lfluidThermophysicalModels \
+    -lmulticomponentThermophysicalModels \
+    -lspecie \
+    -lphysicalProperties \
+    -lOpenFOAM
+endif
+#};
+
 
 // ************************************************************************* //
