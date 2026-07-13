@@ -517,7 +517,16 @@ Foam::argList::argList
 
     // Get executable name
     args_[0]    = fileName(argv[0]);
+#if defined(_WIN32)
+    // On Windows argv[0] is a full path using '\' separators and a '.exe'
+    // suffix. fileName splits paths on '/', so fileName(argv[0]).name() would
+    // return the whole "C:\...\app.exe"; normalise the separators and drop the
+    // extension so executable() is the bare application name, usable directly in
+    // paths (e.g. postProcessing/<app>/<time>) exactly as on Linux.
+    executable_ = fileName(string(argv[0]).replaceAll("\\", "/")).name(true);
+#else
     executable_ = fileName(argv[0]).name();
+#endif
 
     // Check arguments and options, we already have argv[0]
     int nArgs = 1;
