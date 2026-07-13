@@ -21,7 +21,10 @@ LIB_LIBS = \
     -lcoupledThermophysicalTransportModels
 
 ifeq ($(WM_ARCH),mingw_w64)
-    # PE/COFF requires explicit link closure for directly
-    # referenced symbols; ELF resolves them at load time
-    LIB_LIBS += -lfiniteVolume -lfluidThermoThermophysicalTransportModels -lfvConstraints -lfvModels
+    # PE/COFF requires explicit link closure for directly referenced symbols
+    # (ELF resolves them at load time), and for run-time-selected types whose
+    # library is only reached transitively: libfluidThermophysicalTransportModel
+    # provides thermal patch fields (externalCoupledTemperature, ...) that fluid
+    # cases select at run time but which PE would otherwise drop.
+    LIB_LIBS += -lfiniteVolume -lfluidThermophysicalTransportModel -lfluidThermoThermophysicalTransportModels -lfvConstraints -lfvModels
 endif

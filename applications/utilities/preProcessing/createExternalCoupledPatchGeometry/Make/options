@@ -8,3 +8,11 @@ EXE_LIBS = \
     -lfiniteVolume \
     -lfvModels \
     -lmeshTools
+
+ifeq ($(WM_ARCH),mingw_w64)
+    # PE/COFF: the thermal patch fields this utility reads at run time
+    # (externalCoupledTemperature, ...) live in libfluidThermophysicalTransportModel,
+    # reached only transitively on ELF. Link it so its run-time-selection
+    # registrations are available (EXE_LIBS is --whole-archived on mingw).
+    EXE_LIBS += -lfluidThermophysicalTransportModel
+endif
