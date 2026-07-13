@@ -14,6 +14,15 @@ FoamFile
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
+// The film patch types (filmWall, mappedFilmSurface, ...) are registered by
+// libisothermalFilm. extrudeToRegionMesh creates the film region boundary with
+// those types but does not link the film solver module, so on Windows (PE/COFF,
+// no load-time global-namespace symbol resolution) the type is not registered
+// and extrusion fails with "Unknown polyPatch type filmWall". Declare the
+// dependency here so argList loads it for every utility in the case; harmless on
+// Linux where the library is already available.
+libs            ("libisothermalFilm.so");
+
 regionSolvers
 {
     VoF             compressibleVoF;
