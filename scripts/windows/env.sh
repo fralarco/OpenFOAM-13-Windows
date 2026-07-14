@@ -5,10 +5,13 @@
 # attribute are required. Source this before building or running.
 #
 # Configurable via environment (all optional; defaults shown):
-#   OF13_ROOT   base dir holding the OpenFOAM clone + ThirdParty
-#               (default: /c/OF13WinNormal — an EXAMPLE path; use your own)
+#   OF13_ROOT   base dir holding the OpenFOAM clone + the ThirdParty-13-Windows
+#               sibling clone (default: /c/OF13WinNormal — an EXAMPLE path)
 #   OF13_CLONE  the OpenFOAM-13-Windows working copy
 #               (default: $OF13_ROOT/OpenFOAM-13-Windows)
+#   OF13_THIRDPARTY  the ThirdParty-13-Windows sibling clone
+#               (default: $OF13_ROOT/ThirdParty-13-Windows; override for an
+#                existing tree, e.g. /c/OF13WinNormal/ThirdParty)
 #   OF13_USER   WM_PROJECT_USER_DIR for user libs/apps
 #               (default: /c/OF13User/of-user)
 # The only hard requirement is a case-collision-free tree (audit == 0) and a
@@ -44,7 +47,11 @@ export FOAM_APP="$WM_PROJECT_DIR/applications"
 export FOAM_MODULES="$FOAM_APP/modules"
 export FOAM_APPBIN="$WM_PROJECT_DIR/platforms/$WM_OPTIONS/bin"
 export FOAM_LIBBIN="$WM_PROJECT_DIR/platforms/$WM_OPTIONS/lib"
-export WM_THIRD_PARTY_DIR="${OF13_THIRDPARTY:-$OF13_ROOT/ThirdParty}"
+# ThirdParty lives in a SIBLING repo (ThirdParty-13-Windows), cloned next to the
+# OpenFOAM clone -- not a sub-directory of it. Override OF13_THIRDPARTY to point at
+# an existing tree, e.g.  export OF13_THIRDPARTY=/c/OF13WinNormal/ThirdParty
+export OF13_THIRDPARTY="${OF13_THIRDPARTY:-$OF13_ROOT/ThirdParty-13-Windows}"
+export WM_THIRD_PARTY_DIR="$OF13_THIRDPARTY"
 _extArch="${WM_ARCH}${WM_COMPILER}${WM_PRECISION_OPTION}${WM_LABEL_OPTION}"
 export FOAM_EXT_LIBBIN="$WM_THIRD_PARTY_DIR/platforms/$_extArch/lib"
 export SCOTCH_ARCH_PATH="$WM_THIRD_PARTY_DIR/platforms/$_extArch/scotch_7.0.8"

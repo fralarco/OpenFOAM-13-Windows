@@ -21,19 +21,36 @@ case-insensitive NTFS directory works — no case-sensitive attribute and no
 
 ## 2. Get the source
 
+Clone this repository **and** its ThirdParty companion as **siblings** under a
+short base dir (`ThirdParty-13-Windows` is a separate repo, not a sub-directory of
+the OpenFOAM clone):
+
 ```sh
-export OF13_ROOT=/c/OF13                     # choose a short path with no case-colliding files
-git clone <this-repo> "$OF13_ROOT/OpenFOAM-13-Windows"
+export OF13_ROOT=/c/OF13                     # short path, no case-colliding files
+git clone https://github.com/fralarco/OpenFOAM-13-Windows.git  "$OF13_ROOT/OpenFOAM-13-Windows"
+git clone https://github.com/fralarco/ThirdParty-13-Windows.git "$OF13_ROOT/ThirdParty-13-Windows"
 ```
+
+Recommended layout:
+
+```
+/c/OF13/
+  OpenFOAM-13-Windows/     # this repository
+  ThirdParty-13-Windows/   # companion repo: Scotch + MinGW build helpers
+```
+
+The ThirdParty clone is only needed for Scotch decomposition (§6); a plain serial
+build does not require it. To reuse an existing tree, set
+`export OF13_THIRDPARTY=/c/OF13WinNormal/ThirdParty` before sourcing `env.sh`.
 
 All build/run scripts are under `scripts/windows/` and are configured by
 environment variables (see `scripts/windows/README.md`):
 
 | Var | Default | Meaning |
 | --- | --- | --- |
-| `OF13_ROOT` | `/c/OF13WinNormal` | base dir (clone + ThirdParty) |
+| `OF13_ROOT` | `/c/OF13WinNormal` | base dir holding both sibling clones |
 | `OF13_CLONE` | `$OF13_ROOT/OpenFOAM-13-Windows` | the working copy |
-| `OF13_THIRDPARTY` | `$OF13_ROOT/ThirdParty` | Scotch / MS-MPI import lib |
+| `OF13_THIRDPARTY` | `$OF13_ROOT/ThirdParty-13-Windows` | companion repo (Scotch / MS-MPI import lib); override for an existing tree |
 | `MSMPI_INC` | SDK Include dir | export if not visible |
 
 ## 3. Full build

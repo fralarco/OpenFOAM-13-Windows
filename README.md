@@ -1,14 +1,36 @@
 # OpenFOAM-13 — Native Windows (MinGW-w64)
 
-> **Unofficial native Windows port of OpenFOAM Foundation OpenFOAM-13.
-> Not affiliated with or endorsed by OpenFOAM Foundation.**
+> **Unofficial native Windows port / modified fork of OpenFOAM Foundation OpenFOAM-13.
+> Independent project — not affiliated with or endorsed by the OpenFOAM Foundation or CFD Direct.**
 
 A native Windows build of [OpenFOAM Foundation **OpenFOAM-13**](https://openfoam.org),
 built with **MSYS2 UCRT64 / MinGW-w64**. **No WSL, no Cygwin runtime.**
 
-This is a fork of OpenFOAM-13 with minimal, guarded (`ifeq ($(WM_ARCH),mingw_w64)`)
-changes so the toolbox compiles and runs from a **normal NTFS directory** — no
-case-sensitive attribute and no `subst` drive required.
+## Upstream & provenance
+
+This repository is a **Windows-native port / modified fork** of OpenFOAM Foundation
+OpenFOAM-13.
+
+Upstream: <https://github.com/OpenFOAM/OpenFOAM-13>
+
+Most files remain **unchanged** from upstream OpenFOAM-13. Windows-specific changes are
+layered on top to support native Windows builds with MSYS2 UCRT64 / MinGW-w64, MS-MPI, and
+Windows-specific runtime/linking behaviour. All changes are minimal and guarded
+(`ifeq ($(WM_ARCH),mingw_w64)` / `#if defined(_WIN32)`), so Linux behaviour is preserved and
+the toolbox compiles and runs from a **normal NTFS directory** — no case-sensitive attribute
+and no `subst` drive required.
+
+This project is independent and is **not affiliated with or endorsed by the OpenFOAM
+Foundation or CFD Direct**.
+
+### Companion ThirdParty repository
+
+Optional third-party components (Scotch) live in a **separate sibling repository**,
+[`ThirdParty-13-Windows`](https://github.com/fralarco/ThirdParty-13-Windows) — a Windows
+companion to OpenFOAM Foundation
+[ThirdParty-13](https://github.com/OpenFOAM/ThirdParty-13). It is **not** bundled inside
+this repository; clone it **next to** this one (see [Quick build](#quick-build)). MS-MPI is
+an external Microsoft dependency and is not vendored in either repository.
 
 ## What works
 
@@ -30,14 +52,31 @@ case-sensitive attribute and no `subst` drive required.
 
 ## Quick build
 
-From an **MSYS2 UCRT64** shell:
+From an **MSYS2 UCRT64** shell, clone this repo **and** its ThirdParty sibling
+side by side under a short base dir:
 
 ```sh
-git clone <this-repo> /c/OF13/OpenFOAM-13-Windows
 export OF13_ROOT=/c/OF13
-source /c/OF13/OpenFOAM-13-Windows/scripts/windows/env.sh
+git clone https://github.com/fralarco/OpenFOAM-13-Windows.git  "$OF13_ROOT/OpenFOAM-13-Windows"
+git clone https://github.com/fralarco/ThirdParty-13-Windows.git "$OF13_ROOT/ThirdParty-13-Windows"
+
+cd "$OF13_ROOT/OpenFOAM-13-Windows"
+source scripts/windows/env.sh
 cd "$WM_PROJECT_DIR" && ./Allwmake
 ```
+
+This gives the recommended **sibling layout** (ThirdParty is a separate repo, not a
+sub-directory of the OpenFOAM clone):
+
+```
+/c/OF13/
+  OpenFOAM-13-Windows/     # this repository
+  ThirdParty-13-Windows/   # companion repo: Scotch + MinGW build helpers
+```
+
+The ThirdParty clone is only needed for Scotch decomposition; a plain serial build
+does not require it. To reuse an existing tree instead, set
+`export OF13_THIRDPARTY=/c/OF13WinNormal/ThirdParty` before sourcing `env.sh`.
 
 See [BUILD_WINDOWS.md](BUILD_WINDOWS.md) for details and options.
 

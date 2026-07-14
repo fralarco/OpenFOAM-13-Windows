@@ -12,9 +12,9 @@ not required to be `C:\OF13WinNormal`:
 
 | Var | Default | Meaning |
 | --- | --- | --- |
-| `OF13_ROOT` | `/c/OF13WinNormal` | base dir holding the clone + ThirdParty |
+| `OF13_ROOT` | `/c/OF13WinNormal` | base dir holding the OpenFOAM clone + the `ThirdParty-13-Windows` sibling clone |
 | `OF13_CLONE` | `$OF13_ROOT/OpenFOAM-13-Windows` | the OpenFOAM working copy |
-| `OF13_THIRDPARTY` | `$OF13_ROOT/ThirdParty` | ThirdParty (Scotch, MS-MPI import lib) |
+| `OF13_THIRDPARTY` | `$OF13_ROOT/ThirdParty-13-Windows` | companion repo (Scotch, MS-MPI import lib); override for an existing tree, e.g. `/c/OF13WinNormal/ThirdParty` |
 | `OF13_USER` | `/c/OF13User/of-user` | `WM_PROJECT_USER_DIR` |
 | `OF13_WORK` | `$OF13_ROOT` | where run logs + example cases are written |
 | `MSMPI_INC` | SDK Include dir | set by the MS-MPI SDK; export if not visible |
