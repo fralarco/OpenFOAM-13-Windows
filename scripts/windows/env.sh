@@ -55,6 +55,14 @@ export WM_THIRD_PARTY_DIR="$OF13_THIRDPARTY"
 _extArch="${WM_ARCH}${WM_COMPILER}${WM_PRECISION_OPTION}${WM_LABEL_OPTION}"
 export FOAM_EXT_LIBBIN="$WM_THIRD_PARTY_DIR/platforms/$_extArch/lib"
 export SCOTCH_ARCH_PATH="$WM_THIRD_PARTY_DIR/platforms/$_extArch/scotch_7.0.8"
+# ThirdParty decomposition selection (upstream etc/bashrc equivalents, with
+# override honoured). Scotch is the supported ThirdParty decomposition on
+# Windows; Zoltan/METIS/ParMETIS are not built in the initial port, so their
+# Allwmake stages skip cleanly.
+export SCOTCH_TYPE="${SCOTCH_TYPE:-ThirdParty}"
+export ZOLTAN_TYPE="${ZOLTAN_TYPE:-none}"
+export METIS_TYPE="${METIS_TYPE:-none}"
+export PARMETIS_TYPE="${PARMETIS_TYPE:-none}"
 export FOAM_ETC="$WM_PROJECT_DIR/etc"
 export FOAM_TUTORIALS="$WM_PROJECT_DIR/tutorials"
 export FOAM_UTILITIES="$FOAM_APP/utilities"

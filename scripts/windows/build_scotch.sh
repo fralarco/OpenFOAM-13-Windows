@@ -1,20 +1,29 @@
 #!/bin/bash
-# Build the Windows-viable ThirdParty package: Scotch 7.0.8 (serial libscotch)
-# natively with MinGW-w64, as STATIC .a libraries, and install headers+libs to
-# SCOTCH_ARCH_PATH + FOAM_EXT_LIBBIN. Requires a MinGW Makefile.inc in
-# $WM_THIRD_PARTY_DIR/scotch_7.0.8/src (see scripts/windows/scotch/Makefile.inc).
+# Compatibility wrapper: Scotch is built by the sibling ThirdParty repository's
+# own Allwmake (ThirdParty-13-Windows), which ./Allwmake already invokes
+# automatically, exactly as on Linux. This helper reruns just that stage, for
+# debugging or for a ThirdParty clone added after the main build.
 source "$(dirname "$0")/env.sh"
 set +e
-WORK="${OF13_WORK:-$OF13_ROOT}"
-RES="$WORK/build_scotch.out"; : > "$RES"
-SRC="$WM_THIRD_PARTY_DIR/scotch_7.0.8/src"
-echo "SCOTCH_ARCH_PATH=$SCOTCH_ARCH_PATH" | tee -a "$RES"
-[ -f "$SRC/Makefile.inc" ] || { echo "FAIL: no $SRC/Makefile.inc (copy scripts/windows/scotch/Makefile.inc there)"; exit 1; }
-mkdir -p "$SCOTCH_ARCH_PATH/include" "$SCOTCH_ARCH_PATH/lib" "$FOAM_EXT_LIBBIN"
-cd "$SRC" || { echo "no scotch src at $SRC"; exit 1; }
-make realclean >/dev/null 2>&1
-( cd libscotch && make VERSION=7 RELEASE=0 PATCHLEVEL=8 scotch ) >> "$RES" 2>&1
-echo "make libscotch rc=$?" | tee -a "$RES"
-for h in scotch.h scotchf.h; do f=$(find "$SRC/.." -name "$h" 2>/dev/null | head -1); [ -n "$f" ] && cp "$f" "$SCOTCH_ARCH_PATH/include/"; done
-for l in libscotch libscotcherr libscotcherrexit; do for ext in .dll .dll.a .a; do f=$(find "$SRC/.." -name "$l$ext" 2>/dev/null | head -1); [ -n "$f" ] && { cp "$f" "$SCOTCH_ARCH_PATH/lib/"; cp "$f" "$FOAM_EXT_LIBBIN/"; }; done; done
-{ [ -e "$FOAM_EXT_LIBBIN/libscotch.a" ] || [ -e "$FOAM_EXT_LIBBIN/libscotch.dll" ]; } && echo "SCOTCH_BUILT_OK" | tee -a "$RES" || echo "SCOTCH_BUILD_INCOMPLETE" | tee -a "$RES"
+if [ ! -d "$WM_THIRD_PARTY_DIR" ]
+then
+    echo "FAIL: no ThirdParty tree at $WM_THIRD_PARTY_DIR"
+    echo "      Clone ThirdParty-13-Windows as a sibling of the OpenFOAM clone,"
+    echo "      or point OF13_THIRDPARTY at an existing tree."
+    exit 1
+fi
+if [ ! -x "$WM_THIRD_PARTY_DIR/Allwmake" ]
+then
+    echo "FAIL: $WM_THIRD_PARTY_DIR/Allwmake not found or not executable"
+    exit 1
+fi
+"$WM_THIRD_PARTY_DIR/Allwmake"
+rc=$?
+if [ -e "$FOAM_EXT_LIBBIN/libscotch.a" ] || [ -e "$FOAM_EXT_LIBBIN/libscotch.dll" ]
+then
+    echo "SCOTCH_BUILT_OK"
+else
+    echo "SCOTCH_BUILD_INCOMPLETE"
+    [ "$rc" -eq 0 ] && rc=1
+fi
+exit $rc

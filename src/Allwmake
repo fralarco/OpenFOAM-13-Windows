@@ -33,7 +33,14 @@ wmake $targetType meshTools
 
 # Decomposition methods needed by dummyThirdParty
 # (dummy metis, scotch etc) needed by e.g. meshTools
-dummyThirdParty/Allwmake $targetType $*
+# On Windows (PE/COFF) the dummy decomposition libraries link against
+# decompositionMethods, which is not built yet at this point, so on mingw
+# they are deferred until just before parallel/Allwmake, once
+# decompositionMethods' own dependencies exist (ELF resolves this lazily)
+if [ "${WM_ARCH:-}" != mingw_w64 ]
+then
+    dummyThirdParty/Allwmake $targetType $*
+fi
 
 wmake $targetType finiteVolume
 
@@ -58,6 +65,16 @@ wmake $targetType mesh/extrudeModel
 wmake $targetType polyTopoChange
 
 wmake $targetType conversion
+
+# Deferred dummyThirdParty build on Windows (see comment above):
+# decompositionMethods can link now (meshTools/polyTopoChange/finiteVolume all
+# exist) and the dummy decomposition libraries link against it; both must
+# precede parallel/Allwmake, whose libparallel links the dummy metisDecomp
+if [ "${WM_ARCH:-}" = mingw_w64 ]
+then
+    wmake $targetType parallel/decompose/decompositionMethods
+    dummyThirdParty/Allwmake $targetType $*
+fi
 
 parallel/Allwmake $targetType $*
 

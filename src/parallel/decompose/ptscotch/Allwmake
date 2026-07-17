@@ -4,8 +4,9 @@ cd ${0%/*} || exit 1    # Run from this directory
 # Parse arguments for library compilation
 . $WM_PROJECT_DIR/wmake/scripts/AllwmakeParseArguments
 
-# Build if Scotch is enabled and MPI is available
-if [ -n "$WM_MPLIB" ] && [ -d "$FOAM_LIBBIN/$FOAM_MPI" ]
+# Build if Scotch is enabled and a real (non-dummy) MPI is available
+if [ -n "$WM_MPLIB" ] && [ "${FOAM_MPI:-dummy}" != dummy ] \
+&& [ -d "$FOAM_LIBBIN/$FOAM_MPI" ]
 then
     case $SCOTCH_TYPE in
     none)

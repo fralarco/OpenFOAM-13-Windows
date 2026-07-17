@@ -74,9 +74,11 @@ sub-directory of the OpenFOAM clone):
   ThirdParty-13-Windows/   # companion repo: Scotch + MinGW build helpers
 ```
 
-The ThirdParty clone is only needed for Scotch decomposition; a plain serial build
-does not require it. To reuse an existing tree instead, set
+`./Allwmake` builds Scotch from the sibling ThirdParty clone **automatically**
+(as on Linux) and skips it cleanly if the clone is absent — only `method scotch;`
+decomposition needs it. To reuse an existing tree instead, set
 `export OF13_THIRDPARTY=/c/OF13WinNormal/ThirdParty` before sourcing `env.sh`.
+Use `./Allwmake -j N` to limit parallel compilation (default: all cores).
 
 See [BUILD_WINDOWS.md](BUILD_WINDOWS.md) for details and options.
 

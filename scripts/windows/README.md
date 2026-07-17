@@ -60,8 +60,7 @@ default font is used if it is missing.
 | `windows-terminal-profile.json` | optional Windows Terminal profile + `OpenFOAM Dark` colour scheme |
 | `env.sh` | the shared build/run environment (source this) |
 | `run_serial.sh` | **validation smoke test**: blockMesh→checkMesh→foamRun on pitzDaily |
-| `build_scotch.sh` | build ThirdParty Scotch 7.0.8 (static, MinGW) |
-| `scotch/Makefile.inc` | the MinGW Scotch config (copy into scotch src) |
+| `build_scotch.sh` | compatibility wrapper: reruns the sibling ThirdParty `Allwmake` (Scotch); `./Allwmake` already does this |
 | `run_decompose.sh` | decomposePar with the `scotch` method (2 subdomains) |
 | `setup_msmpi.sh` | make `libmsmpi.a` from the MS-MPI SDK |
 | `build_pstream_mpi.sh` | build `lib/msmpi/libPstream.dll` (`WM_MPLIB=MSMPI`) |
@@ -80,10 +79,11 @@ Serial build + run:
 bash run_serial.sh
 ```
 
-Scotch decomposition:
+Scotch decomposition (`./Allwmake` already does all of this automatically —
+the ThirdParty repo's `Allwmake` installs its own MinGW `Makefile.inc` and
+builds static libscotch; this flow reruns just that stage):
 ```sh
-cp scotch/Makefile.inc "$OF13_THIRDPARTY/scotch_7.0.8/src/"   # once
-bash build_scotch.sh
+bash build_scotch.sh                                          # runs $WM_THIRD_PARTY_DIR/Allwmake
 wmake libso "$OF13_CLONE/src/parallel/decompose/scotch"       # real scotchDecomp
 bash run_decompose.sh
 ```

@@ -29,6 +29,33 @@ else
     echo "Allwmake: no ThirdParty directory found - skipping"
 fi
 
+# On native Windows (PE/COFF) a clean tree cannot follow the upstream order
+# directly: a DLL must resolve every symbol at link time, and libOpenFOAM and
+# libPstream reference each other (ELF resolves this lazily at load time).
+# Seed the cycle once: compile the OSspecific object and the dummy Pstream
+# objects, generate a provisional libPstream import library from them, and
+# build libOpenFOAM against it. src/Allwmake then proceeds in the upstream
+# order, relinking the real dummy libPstream.dll. No-op once seeded.
+if [ "${WM_ARCH:-}" = mingw_w64 ] && \
+   { [ ! -e "$FOAM_LIBBIN/dummy/libPstream.dll.a" ] || \
+     [ ! -e "$FOAM_LIBBIN/libOpenFOAM.dll" ]; }
+then
+    echo "Allwmake: seeding Windows libOpenFOAM <-> libPstream link cycle"
+    wmakeLnInclude src/OpenFOAM
+    src/OSspecific/MSwindows/Allwmake
+    (cd src/Pstream/dummy && wmakeLnInclude . && wmake objects)
+    pstreamObj="$(find "platforms/$WM_OPTIONS/obj" -name UPstream.o | head -1)"
+    [ -f "$pstreamObj" ] || {
+        echo "Allwmake error: dummy Pstream objects not found under platforms/$WM_OPTIONS/obj"
+        exit 1
+    }
+    mkdir -p "$FOAM_LIBBIN/dummy"
+    dlltool --export-all-symbols -D libPstream.dll \
+        -l "$FOAM_LIBBIN/dummy/libPstream.dll.a" "$(dirname "$pstreamObj")"/*.o
+    wmake libso src/OpenFOAM
+    unset pstreamObj
+fi
+
 # Compile OpenFOAM libraries and applications
 src/Allwmake $targetType $*
 

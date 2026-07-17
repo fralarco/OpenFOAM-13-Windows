@@ -63,10 +63,16 @@ source scripts/windows/env.sh
 cd "$WM_PROJECT_DIR" && ./Allwmake
 ```
 
-`Allwmake` builds `src` + `applications` in dependency order. The Windows-guarded
-wmake changes handle the `libOpenFOAM ↔ libPstream` link cycle (PE has no lazy
-symbol resolution), so no special driver is needed. A first build takes a while;
-re-running `./Allwmake` resumes incrementally.
+`Allwmake` follows the standard upstream sequence: it builds the wmake tools,
+runs the sibling ThirdParty `Allwmake` (which prepares **Scotch** automatically
+on Windows, see §6), and then builds `src` + `applications` in dependency order.
+On a clean Windows tree it first seeds the `libOpenFOAM ↔ libPstream` link cycle
+once (PE has no lazy symbol resolution); re-runs skip that step and resume
+incrementally.
+
+Compilation is parallel per target (`WM_NCOMPPROCS`, default: all cores). Use
+`./Allwmake -j N` to limit it — a moderate `N` (e.g. `-j 4`) is kinder to
+laptops or machines with little RAM. A first build takes a while.
 
 ## 4. The OpenFOAM 13 Windows Terminal
 
@@ -129,10 +135,18 @@ the case.
 
 ## 6. Scotch decomposition (optional)
 
+Scotch is built **automatically** by `./Allwmake` (§3), exactly as on Linux: the
+sibling `ThirdParty-13-Windows` clone's own `Allwmake` installs its MinGW
+configuration (`etc/wmakeFiles/scotch/Makefile.inc.x86-64_pc_mingw_w64-OpenFOAM`)
+into the scotch source tree and builds the static `libscotch*.a`, after which the
+OpenFOAM build compiles the real `scotchDecomp` (`SCOTCH_TYPE=ThirdParty`, set by
+`env.sh`, override honoured). No manual step is needed.
+
+To rerun only the Scotch stage — e.g. after adding the ThirdParty clone later:
+
 ```sh
-cp scripts/windows/scotch/Makefile.inc "$OF13_THIRDPARTY/scotch_7.0.8/src/"
-bash scripts/windows/build_scotch.sh          # static libscotch*.a
-wmake libso src/parallel/decompose/scotch     # real scotchDecomp
+bash scripts/windows/build_scotch.sh          # wrapper: runs $WM_THIRD_PARTY_DIR/Allwmake
+wmake libso src/parallel/decompose/scotch     # real scotchDecomp (if not via ./Allwmake)
 bash scripts/windows/run_decompose.sh         # decomposePar -method scotch
 ```
 
