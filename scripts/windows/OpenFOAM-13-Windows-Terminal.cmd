@@ -19,14 +19,25 @@ if not defined MSYS2_ROOT set "MSYS2_ROOT=C:\msys64"
 rem --- this launcher's directory: scripts\windows\ ---
 set "OF_SCRIPT_DIR=%~dp0"
 
-rem --- Locate the clone from this launcher's own path, so the repository runs
-rem     from wherever it was cloned (no hard-coded install directory):
+rem --- Clone resolution. This launcher physically lives inside the clone
 rem       <base>\OpenFOAM-13-Windows\scripts\windows\<this file>
-rem     An existing OF13_CLONE / OF13_ROOT in the environment still wins.
+rem     so its own path is authoritative: a stale global OF13_ROOT/OF13_CLONE
+rem     left over from another installation must never silently redirect this
+rem     launcher to a different clone. Inherited values that disagree are
+rem     reported and ignored; use OF13_THIRDPARTY to relocate ThirdParty.
 for %%I in ("%~dp0..\..") do set "OF_CLONE_DIR=%%~fI"
 for %%I in ("%OF_CLONE_DIR%\..") do set "OF_BASE_DIR=%%~fI"
-if not defined OF13_CLONE set "OF13_CLONE=%OF_CLONE_DIR%"
-if not defined OF13_ROOT  set "OF13_ROOT=%OF_BASE_DIR%"
+
+if defined OF13_CLONE for %%I in ("%OF13_CLONE%") do if /I not "%%~fI"=="%OF_CLONE_DIR%" (
+  echo NOTE: ignoring inherited OF13_CLONE=%OF13_CLONE%
+  echo       this launcher belongs to "%OF_CLONE_DIR%"
+)
+if defined OF13_ROOT for %%I in ("%OF13_ROOT%") do if /I not "%%~fI"=="%OF_BASE_DIR%" (
+  echo NOTE: ignoring inherited OF13_ROOT=%OF13_ROOT%
+  echo       using "%OF_BASE_DIR%" ^(the parent of this clone^)
+)
+set "OF13_CLONE=%OF_CLONE_DIR%"
+set "OF13_ROOT=%OF_BASE_DIR%"
 
 rem --- prerequisites ---
 if not exist "%MSYS2_ROOT%\usr\bin\bash.exe" (

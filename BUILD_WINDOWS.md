@@ -76,6 +76,32 @@ laptops or machines with little RAM. A first build takes a while.
 
 ## 4. The OpenFOAM 13 Windows Terminal
 
+The launchers are the **recommended convenience entry point**: they open a
+correctly configured MSYS2 **UCRT64** shell with the OpenFOAM environment
+already loaded, from which `./Allwmake` (§3) and the normal `./Allrun` workflow
+can be run directly. They **configure the shell only — they do not provision the
+toolchain**: MSYS2 and the dependencies in §1 must already be installed, and the
+shell reports (never installs) whatever is missing, grouped by what it affects —
+serial build, tutorial scripts, MS-MPI compilation, parallel execution.
+
+Starting an MSYS2 UCRT64 shell by hand and sourcing `scripts/windows/env.sh`
+(§3) remains fully supported, and is the recommended fallback when diagnosing
+environment problems.
+
+Each launcher resolves the clone from **its own location**, so the repository
+works from wherever it was cloned and nothing needs editing. A stale global
+`OF13_ROOT`/`OF13_CLONE` from another installation is reported and ignored
+rather than silently redirecting the launcher. To use a ThirdParty tree that is
+not the sibling clone, or a different clone, override explicitly:
+
+```sh
+export OF13_THIRDPARTY=/d/path/to/ThirdParty-13-Windows   # before launching
+```
+```powershell
+.\OpenFOAM-13-Windows-Shell.ps1 -Of13Clone D:\other\OpenFOAM-13-Windows `
+                                -Of13Thirdparty D:\other\ThirdParty-13-Windows
+```
+
 For day-to-day use, launch the ready-made environment instead of sourcing
 scripts by hand.
 

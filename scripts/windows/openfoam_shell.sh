@@ -142,6 +142,15 @@ HLP
             command -v "$_t" >/dev/null 2>&1 || _missing="$_missing $_t"
         done
         _built="$(ls "${FOAM_LIBBIN:-/nonexistent}"/*.dll 2>/dev/null | wc -l) libs, $(ls "${FOAM_APPBIN:-/nonexistent}"/*.exe 2>/dev/null | wc -l) apps"
+        local _cases _mpicc _mpirun _tp
+        _cases="$(command -v bc >/dev/null 2>&1 && echo 'bc: yes' || echo 'bc: MISSING (pacman -S bc)')"
+        if [ -f "${MSMPI_INC:-/nonexistent}/mpi.h" ]; then _mpicc='SDK mpi.h: yes'
+        else _mpicc='SDK mpi.h: MISSING (install msmpisdk.msi)'; fi
+        if [ -f "${WM_THIRD_PARTY_DIR:-/nonexistent}/msmpi/lib/libmsmpi.a" ]; then
+            _mpicc="$_mpicc, libmsmpi.a: yes"
+        else _mpicc="$_mpicc, libmsmpi.a: MISSING (run setup_msmpi.sh)"; fi
+        _mpirun="$(command -v mpiexec >/dev/null 2>&1 && echo 'mpiexec: yes' || echo 'mpiexec: MISSING (install msmpisetup.exe)')"
+        _tp="$([ -d "${WM_THIRD_PARTY_DIR:-/nonexistent}" ] && echo 'present' || echo 'MISSING (Scotch skipped; set OF13_THIRDPARTY)')"
         _pathsum="$(printf '%s' "$PATH" | tr ':' '\n' | grep -iE 'platforms|Microsoft MPI|ucrt64/bin' | head -6 | tr '\n' ' ')"
         printf '%sOpenFOAM 13 Windows -- environment%s\n\n' "$_ofC" "$_ofR"
         printf '  %-18s %s\n' "WM_PROJECT_DIR"    "${WM_PROJECT_DIR:-(unset)}"
@@ -158,9 +167,15 @@ HLP
         printf '  %-18s %s\n' "which foamRun"     "$_foamrun"
         printf '  %-18s %s\n' "which mpiexec"     "$_mpiexec"
         printf '  %-18s %s\n' "gcc version"       "$_gcc"
-        printf '  %-18s %s\n' "toolchain"         "${_missing:+missing:$_missing}${_missing:-complete (gcc g++ make flex bison)}"
         printf '  %-18s %s\n' "built"             "$_built"
+        printf '  %-18s %s\n' "ThirdParty"        "$_tp"
         printf '  %-18s %s\n' "PATH (OF/MPI)"     "${_pathsum:-(none)}"
+        printf '\n%sPrerequisites by capability%s\n' "$_ofC" "$_ofR"
+        printf '  %-22s %s\n' "serial build" \
+            "${_missing:+MISSING:$_missing}${_missing:-gcc g++ make flex bison: yes}"
+        printf '  %-22s %s\n' "tutorial scripts"  "$_cases"
+        printf '  %-22s %s\n' "MS-MPI compilation" "$_mpicc"
+        printf '  %-22s %s\n' "parallel execution" "$_mpirun"
     }
 
     # --- compact startup banner ------------------------------------------
@@ -178,17 +193,31 @@ HLP
     printf '%s%-8s%s%s\n' "$_ofD" "MPI" "$_ofR" "${_ofMPI}"
     printf '%s%-8s%s%s\n\n' "$_ofD" "Options" "$_ofR" "${WM_OPTIONS}"
 
-    # Show the workflow that actually applies: an unbuilt clone needs Allwmake
-    # first, so do not advertise running tutorials that cannot work yet. Also
-    # report a missing MSYS2 toolchain, which would fail deep inside the build.
-    _ofMissing=
-    for _ofTool in gcc g++ make flex bison; do
-        command -v "$_ofTool" >/dev/null 2>&1 || _ofMissing="$_ofMissing $_ofTool"
-    done
-    if [ -n "$_ofMissing" ]; then
-        printf '%sToolchain incomplete -- missing:%s%s\n' "$_ofC" "$_ofR" "$_ofMissing"
-        printf '  pacman -S mingw-w64-ucrt-x86_64-gcc make flex bison\n\n'
+    # ThirdParty is a SIBLING repository, not part of this clone. Validate the
+    # resolved directory (OF13_THIRDPARTY override honoured by env.sh) and, when
+    # absent, print the exact path expected and how to point elsewhere.
+    if [ ! -d "$WM_THIRD_PARTY_DIR" ]; then
+        printf '%sThirdParty not found:%s %s\n' "$_ofC" "$_ofR" "$WM_THIRD_PARTY_DIR"
+        printf '  Scotch decomposition will be skipped by ./Allwmake. Either clone it\n'
+        printf '  beside this repository, or point at an existing tree and relaunch:\n'
+        printf '    export OF13_THIRDPARTY=/d/path/to/ThirdParty-13-Windows\n\n'
     fi
+
+    # Prerequisites, reported per capability (see BUILD_WINDOWS.md). This shell
+    # configures the environment only -- it never installs anything.
+    _ofBuild= ; _ofCase=
+    for _ofTool in gcc g++ make flex bison; do
+        command -v "$_ofTool" >/dev/null 2>&1 || _ofBuild="$_ofBuild $_ofTool"
+    done
+    command -v bc >/dev/null 2>&1 || _ofCase=" bc"
+    if [ -n "$_ofBuild" ]; then
+        printf '%sMissing for a serial build:%s%s\n' "$_ofC" "$_ofR" "$_ofBuild"
+        printf '  pacman -S mingw-w64-ucrt-x86_64-gcc make flex bison\n'
+    fi
+    if [ -n "$_ofCase" ]; then
+        printf '%sMissing for tutorial scripts:%s%s   (pacman -S bc)\n' "$_ofC" "$_ofR" "$_ofCase"
+    fi
+    [ -n "$_ofBuild$_ofCase" ] && printf '\n'
     if command -v foamRun >/dev/null 2>&1; then
         printf '%sTypical workflow%s\n' "$_ofD" "$_ofR"
         printf '  cd $FOAM_RUN\n'
