@@ -2,7 +2,11 @@
 # Build the real (MS-MPI) Pstream: platforms/<opt>/lib/msmpi/libPstream.dll.
 # Run after setup_msmpi.sh (libmsmpi.a) and with MSMPI_INC pointing at the SDK
 # Include dir. libOpenFOAM must already be built (serial pass).
-WM_MPLIB=MSMPI FOAM_MPI=msmpi source "$(dirname "$0")/env.sh"
+# Export before sourcing: an assignment prefix on `source` (a regular builtin)
+# is reverted when it returns, leaving WM_MPLIB empty for the wmake call below,
+# so mplibType would include mplib<empty> and drop the MS-MPI include/libs.
+export WM_MPLIB=MSMPI FOAM_MPI=msmpi
+source "$(dirname "$0")/env.sh"
 set +e
 export MSMPI_INC="${MSMPI_INC:-/c/Program Files (x86)/Microsoft SDKs/MPI/Include}"
 WORK="${OF13_WORK:-$OF13_ROOT}"

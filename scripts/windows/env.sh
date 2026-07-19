@@ -68,6 +68,21 @@ export FOAM_TUTORIALS="$WM_PROJECT_DIR/tutorials"
 export FOAM_UTILITIES="$FOAM_APP/utilities"
 export FOAM_SOLVERS="$FOAM_APP/solvers"
 
+# The MS-MPI installers export MSMPI_INC/MSMPI_BIN in WINDOWS form with a
+# trailing backslash (e.g. C:\Program Files\Microsoft MPI\Bin\). Normalise both
+# to POSIX form without the trailing slash: a drive-letter path cannot be used
+# in a colon-separated PATH, and a trailing backslash escapes the closing quote
+# of the -isystem "$(MSMPI_INC)" argument in wmake's mplibMSMPI rule, so the
+# compiler never receives the SDK include directory.
+for _v in MSMPI_INC MSMPI_BIN; do
+    eval "_msmpiVal=\${$_v:-}"
+    if [ -n "$_msmpiVal" ]; then
+        _msmpiVal="$(cygpath -u "$_msmpiVal" 2>/dev/null || echo "$_msmpiVal")"
+        eval "export $_v=\"\${_msmpiVal%/}\""
+    fi
+done
+unset _v _msmpiVal
+
 # Put MS-MPI's mpiexec on PATH if present (installer default or $MSMPI_BIN) so
 # parallel launches -- and the MS-MPI auto-detection just below -- work out of
 # the box. Harmless for serial builds.
