@@ -33,13 +33,19 @@ _OF_SELFDIR="${_OF_SELFSRC%/*}"
 [ "$_OF_SELFDIR" = "$_OF_SELFSRC" ] && _OF_SELFDIR="."
 _OF_SELFDIR="$(cd "$_OF_SELFDIR" 2>/dev/null && pwd || echo "$_OF_SELFDIR")"
 
-# Accept a Windows-style OF13_ROOT (C:\...) passed from the .cmd launcher.
-if [ -n "${OF13_ROOT:-}" ]; then
-    case "$OF13_ROOT" in
-        *\\*|[A-Za-z]:*) OF13_ROOT="$(cygpath -u "$OF13_ROOT" 2>/dev/null || echo "$OF13_ROOT")";;
+# Accept Windows-style paths (C:\...) passed from the .cmd/.ps1 launchers, which
+# derive them from their own location so the clone can live anywhere.
+for _ofVar in OF13_ROOT OF13_CLONE OF13_THIRDPARTY OF13_WORK; do
+    eval "_ofVal=\${$_ofVar:-}"
+    case "${_ofVal}" in
+        '') continue;;
+        *\\*|[A-Za-z]:*)
+            _ofVal="$(cygpath -u "$_ofVal" 2>/dev/null || echo "$_ofVal")"
+            eval "export $_ofVar=\"\$_ofVal\"";;
+        *) eval "export $_ofVar=\"\$_ofVal\"";;
     esac
-    export OF13_ROOT
-fi
+done
+unset _ofVar _ofVal
 
 _OF_ROOT="${OF13_ROOT:-/c/OF13WinNormal}"
 _OF_CLONE="${OF13_CLONE:-$_OF_ROOT/OpenFOAM-13-Windows}"
@@ -81,6 +87,14 @@ else
         cat <<HLP
 ${_ofC}OpenFOAM 13 Windows -- help${_ofR}
 
+${_ofD}Build from source (needed once, in this same shell):${_ofR}
+  cd \$WM_PROJECT_DIR
+  ./Allwmake               # -j N to limit parallel compilation, e.g. ./Allwmake -j 4
+  Requires the MSYS2 UCRT64 toolchain:
+      pacman -S mingw-w64-ucrt-x86_64-gcc make flex bison
+  Scotch is built automatically from the sibling ThirdParty-13-Windows clone
+  when it is present; it is skipped cleanly when it is not.
+
 ${_ofD}Standard OpenFOAM workflow (recommended):${_ofR}
   cd \$FOAM_RUN
   cp -r \$FOAM_TUTORIALS/incompressibleFluid/pitzDaily .
@@ -119,9 +133,15 @@ HLP
 
     # --- status ----------------------------------------------------------
     of13status() {
-        local _mpiexec _foamrun _pathsum
+        local _mpiexec _foamrun _pathsum _gcc _missing _t _built
         _mpiexec="$(command -v mpiexec 2>/dev/null || echo '(not found)')"
         _foamrun="$(command -v foamRun 2>/dev/null || echo '(not found)')"
+        _gcc="$(gcc -dumpversion 2>/dev/null || echo '(not found)')"
+        _missing=
+        for _t in gcc g++ make flex bison; do
+            command -v "$_t" >/dev/null 2>&1 || _missing="$_missing $_t"
+        done
+        _built="$(ls "${FOAM_LIBBIN:-/nonexistent}"/*.dll 2>/dev/null | wc -l) libs, $(ls "${FOAM_APPBIN:-/nonexistent}"/*.exe 2>/dev/null | wc -l) apps"
         _pathsum="$(printf '%s' "$PATH" | tr ':' '\n' | grep -iE 'platforms|Microsoft MPI|ucrt64/bin' | head -6 | tr '\n' ' ')"
         printf '%sOpenFOAM 13 Windows -- environment%s\n\n' "$_ofC" "$_ofR"
         printf '  %-18s %s\n' "WM_PROJECT_DIR"    "${WM_PROJECT_DIR:-(unset)}"
@@ -137,6 +157,9 @@ HLP
         printf '  %-18s %s\n' "MPI_BUFFER_SIZE"   "${MPI_BUFFER_SIZE:-(unset)}"
         printf '  %-18s %s\n' "which foamRun"     "$_foamrun"
         printf '  %-18s %s\n' "which mpiexec"     "$_mpiexec"
+        printf '  %-18s %s\n' "gcc version"       "$_gcc"
+        printf '  %-18s %s\n' "toolchain"         "${_missing:+missing:$_missing}${_missing:-complete (gcc g++ make flex bison)}"
+        printf '  %-18s %s\n' "built"             "$_built"
         printf '  %-18s %s\n' "PATH (OF/MPI)"     "${_pathsum:-(none)}"
     }
 
@@ -154,14 +177,32 @@ HLP
     printf '%s%-8s%s%s\n' "$_ofD" "Run dir" "$_ofR" "${FOAM_RUN}"
     printf '%s%-8s%s%s\n' "$_ofD" "MPI" "$_ofR" "${_ofMPI}"
     printf '%s%-8s%s%s\n\n' "$_ofD" "Options" "$_ofR" "${WM_OPTIONS}"
-    printf '%sTypical workflow%s\n' "$_ofD" "$_ofR"
-    printf '  cd $FOAM_RUN\n'
-    printf '  cp -r $FOAM_TUTORIALS/incompressibleFluid/pitzDaily .\n'
-    printf '  cd pitzDaily\n'
-    printf '  ./Allrun\n\n'
+
+    # Show the workflow that actually applies: an unbuilt clone needs Allwmake
+    # first, so do not advertise running tutorials that cannot work yet. Also
+    # report a missing MSYS2 toolchain, which would fail deep inside the build.
+    _ofMissing=
+    for _ofTool in gcc g++ make flex bison; do
+        command -v "$_ofTool" >/dev/null 2>&1 || _ofMissing="$_ofMissing $_ofTool"
+    done
+    if [ -n "$_ofMissing" ]; then
+        printf '%sToolchain incomplete -- missing:%s%s\n' "$_ofC" "$_ofR" "$_ofMissing"
+        printf '  pacman -S mingw-w64-ucrt-x86_64-gcc make flex bison\n\n'
+    fi
+    if command -v foamRun >/dev/null 2>&1; then
+        printf '%sTypical workflow%s\n' "$_ofD" "$_ofR"
+        printf '  cd $FOAM_RUN\n'
+        printf '  cp -r $FOAM_TUTORIALS/incompressibleFluid/pitzDaily .\n'
+        printf '  cd pitzDaily\n'
+        printf '  ./Allrun\n\n'
+    else
+        printf '%sNot built yet -- build first (this takes a while)%s\n' "$_ofD" "$_ofR"
+        printf '  cd $WM_PROJECT_DIR\n'
+        printf '  ./Allwmake            # add -j N to limit parallel compilation\n\n'
+    fi
     printf "Type '%sof13help%s' for help \xc2\xb7 '%sof13status%s' for diagnostics\n" \
         "$_ofC" "$_ofR" "$_ofC" "$_ofR"
-    unset _ofMPI _ofReady
+    unset _ofMPI _ofReady _ofMissing _ofTool
 fi
 
 unset _OF_SELFSRC _OF_SELFDIR _OF_ROOT _OF_CLONE

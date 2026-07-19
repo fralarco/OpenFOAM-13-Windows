@@ -7,17 +7,26 @@ rem  OpenFOAM-13-Windows-Terminal.cmd (Windows Terminal); this launcher is the
 rem  fallback and sources the same openfoam_shell.sh -- no duplicated env logic.
 rem  Independent, clean-room implementation.
 rem
-rem  Configurable (examples -- override via environment or edit here):
-rem    MSYS2_ROOT   MSYS2 install root      (default C:\msys64)
-rem    OF13_ROOT    OpenFOAM base directory (default C:\OF13WinNormal)
+rem  Configurable (override via environment; nothing needs editing here):
+rem    MSYS2_ROOT   MSYS2 install root  (default C:\msys64)
+rem    OF13_CLONE   OpenFOAM clone      (default: derived from this file)
+rem    OF13_ROOT    base directory      (default: the clone's parent)
 rem  No administrator rights required.
 rem ==========================================================================
 
 if not defined MSYS2_ROOT set "MSYS2_ROOT=C:\msys64"
-if not defined OF13_ROOT  set "OF13_ROOT=C:\OF13WinNormal"
 
 rem --- this launcher's directory: scripts\windows\ ---
 set "OF_SCRIPT_DIR=%~dp0"
+
+rem --- Locate the clone from this launcher's own path, so the repository runs
+rem     from wherever it was cloned (no hard-coded install directory):
+rem       <base>\OpenFOAM-13-Windows\scripts\windows\<this file>
+rem     An existing OF13_CLONE / OF13_ROOT in the environment still wins.
+for %%I in ("%~dp0..\..") do set "OF_CLONE_DIR=%%~fI"
+for %%I in ("%OF_CLONE_DIR%\..") do set "OF_BASE_DIR=%%~fI"
+if not defined OF13_CLONE set "OF13_CLONE=%OF_CLONE_DIR%"
+if not defined OF13_ROOT  set "OF13_ROOT=%OF_BASE_DIR%"
 
 rem --- prerequisites ---
 if not exist "%MSYS2_ROOT%\usr\bin\bash.exe" (
